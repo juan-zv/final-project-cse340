@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+
+<h1>Owner / Admin Dashboard</h1>
+<p>Complete system control overview.</p>
+
+<div class="admin-controls grid">
+    
+    <div class="card">
+        <h2>Inventory Management</h2>
+        <a href="/admin/vehicles/add" class="btn">Add New Vehicle</a>
+        <a href="/admin/vehicles" class="btn-secondary">Edit / Delete Inventory</a>
+    </div>
+
+    <div class="card">
+        <h2>Category Management</h2>
+        <a href="/admin/categories/add" class="btn">Add New Category</a>
+        <a href="/admin/categories" class="btn-secondary">Manage Categories</a>
+    </div>
+
+    <div class="card">
+        <h2>Employee Tools</h2>
+        <a href="/employee/dashboard" class="btn">Access Employee View</a>
+        <a href="/admin/employees/manage" class="btn-secondary">Manage Staff Accounts</a>
+    </div>
+
+    <div class="card">
+        <h2>System Activity Logs</h2>
+        <a href="/admin/logs" class="btn">View User Logs</a>
+    </div>
+
+</div>
+
+<%- include('../partials/footer') %>
