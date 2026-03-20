@@ -1,0 +1,141 @@
+:root {
+    --text-light: #f3f4f6;
+    --bg-base: #111927;
+    --glass-bg: rgba(17, 25, 40, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.125);
+    --accent-teal: hsl(162, 77%, 40%);
+    --accent-blue: hsl(218, 39%, 11%);
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text-light);
+    
+    /* Background styles */
+    background-color: var(--bg-base);
+    background-image: 
+        radial-gradient(at 47% 33%, var(--accent-teal) 0, transparent 59%), 
+        radial-gradient(at 82% 65%, var(--accent-blue) 0, transparent 55%);
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+    margin-bottom: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+a {
+    color: var(--accent-teal);
+    text-decoration: none;
+    transition: text-shadow 0.3s ease;
+}
+
+a:hover {
+    text-shadow: 0 0 8px rgba(29, 180, 137, 0.6);
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: var(--glass-bg);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+/* Components */
+.card {
+    padding: 2rem;
+    margin: 1rem 0;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Form Elements */
+input, select, textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-light);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-teal);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(29, 180, 137, 0.2);
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-align: center;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary {
+    background-color: rgba(29, 180, 137, 0.2);
+    border-color: var(--accent-teal);
+}
+
+.btn-primary:hover {
+    background-color: rgba(29, 180, 137, 0.4);
+    box-shadow: 0 0 15px rgba(29, 180, 137, 0.4);
+}
+
+/* Layout Elements */
+header.glass-panel, nav.glass-panel {
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
