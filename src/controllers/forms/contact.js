@@ -33,11 +33,11 @@ const handleContactSubmission = async (req, res) => {
     }
 
     // Extract validated data
-    const { subject, message } = req.body;
+    const { sender_name, sender_email, message } = req.body;
 
     try {
         // Save to database
-        await createContactForm(subject, message);
+        await createContactForm(sender_name, sender_email, message);
         console.log('Contact form submitted successfully');
         // After successfully saving to the database
         req.flash('success', 'Thank you for contacting us! We will respond soon.');

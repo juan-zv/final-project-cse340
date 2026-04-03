@@ -3,17 +3,18 @@ import db from '../db.js';
 /**
  * Inserts a new contact form submission into the database.
  * 
- * @param {string} subject - The subject of the contact message
- * @param {string} message - The message content
+ * @param {string} senderName - The sender name
+ * @param {string} senderEmail - The sender email
+ * @param {string} messageBody - The message content
  * @returns {Promise<Object>} The newly created contact form record
  */
-const createContactForm = async (subject, message) => {
+const createContactForm = async (senderName, senderEmail, messageBody) => {
     const query = `
-        INSERT INTO contact_messages (subject, message)
-        VALUES ($1, $2)
+        INSERT INTO contact_messages (sender_name, sender_email, message_body)
+        VALUES ($1, $2, $3)
         RETURNING *
     `;
-    const result = await db.query(query, [subject, message]);
+    const result = await db.query(query, [senderName, senderEmail, messageBody]);
     return result.rows[0];
 };
 
@@ -24,7 +25,12 @@ const createContactForm = async (subject, message) => {
  */
 const getAllContactForms = async () => {
     const query = `
-        SELECT id, subject, message, created_at AS submitted
+        SELECT
+            message_id AS id,
+            sender_name AS senderName,
+            sender_email AS senderEmail,
+            message_body AS message,
+            created_at AS submitted
         FROM contact_messages
         ORDER BY created_at DESC
     `;

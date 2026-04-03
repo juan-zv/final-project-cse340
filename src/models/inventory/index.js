@@ -132,4 +132,52 @@ const getVehicleByRouteId = async (slugId) => {
     };
 };
 
-export { getInventory, getVehicleByRouteId };
+const getVehicleById = async (invId) => {
+    const numericId = Number(invId);
+    if (!Number.isInteger(numericId) || numericId < 1) {
+        return {};
+    }
+
+    const query = `
+        SELECT
+            i.inv_id,
+            i.inv_make,
+            i.inv_model,
+            i.inv_year,
+            i.inv_description,
+            i.inv_image,
+            i.inv_thumbnail,
+            i.inv_price,
+            i.inv_miles,
+            i.is_available,
+            c.category_name
+        FROM inventory i
+        JOIN categories c ON i.category_id = c.category_id
+        WHERE i.inv_id = $1
+        LIMIT 1
+    `;
+
+    const result = await db.query(query, [numericId]);
+    const row = result.rows[0];
+
+    if (!row) {
+        return {};
+    }
+
+    return {
+        id: row.inv_id,
+        slug: toSlug(row),
+        make: row.inv_make,
+        model: row.inv_model,
+        year: row.inv_year,
+        description: row.inv_description,
+        image: row.inv_image,
+        thumbnail: row.inv_thumbnail,
+        price: row.inv_price,
+        miles: row.inv_miles,
+        status: row.is_available ? 'Available' : 'Unavailable',
+        category: row.category_name
+    };
+};
+
+export { getInventory, getVehicleByRouteId, getVehicleById };

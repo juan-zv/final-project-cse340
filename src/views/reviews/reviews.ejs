@@ -13,29 +13,29 @@
 	<% if (allReviews.length > 0) { %>
 		<% allReviews.forEach((review) => { %>
 			<article class="card glass-panel" style="margin: 1rem 0;">
-				<h3>
-					<%= review.invYear || '' %>
-					<%= review.invMake || '' %>
-					<%= review.invModel || '' %>
-				</h3>
+				<h3><%= review.vehicleName || 'Vehicle details unavailable' %></h3>
 				<p><%= review.reviewText || '' %></p>
 				<p>
 					By <%= review.accountFirstName || 'Customer' %>
 					on <%= review.reviewDate ? new Date(review.reviewDate).toLocaleDateString() : (review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A') %>
 				</p>
 
-				<% const canEditOwn = user && (user.id === review.accountId || user.account_id === review.accountId); %>
+				<% const currentUserId = Number(user && (user.id ?? user.account_id)); %>
+				<% const reviewOwnerId = Number(review.accountId); %>
+				<% const canEditOwn = Number.isFinite(currentUserId) && currentUserId === reviewOwnerId; %>
 				<% const canModerate = role === 'Employee' || role === 'Admin'; %>
 
 				<% if (canEditOwn) { %>
 					<a href="/reviews/<%= review.reviewId %>/edit" class="btn">Edit</a>
 					<form action="/reviews/<%= review.reviewId %>/delete" method="POST" style="display:inline-block; margin-left: 0.5rem;">
+						<input type="hidden" name="returnTo" value="/reviews">
 						<button type="submit" class="btn">Delete</button>
 					</form>
 				<% } %>
 
 				<% if (canModerate && !canEditOwn) { %>
 					<form action="/reviews/<%= review.reviewId %>/delete" method="POST" style="display:inline-block; margin-top: 0.5rem;">
+						<input type="hidden" name="returnTo" value="/reviews">
 						<button type="submit" class="btn">Moderate / Remove</button>
 					</form>
 				<% } %>

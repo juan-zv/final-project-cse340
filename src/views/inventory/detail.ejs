@@ -54,4 +54,34 @@
 	<% } %>
 </section>
 
+<section class="card glass-panel">
+	<h2>Reviews for This Vehicle</h2>
+	<% const vehicleReviews = Array.isArray(reviews) ? reviews : []; %>
+	<% if (vehicleReviews.length > 0) { %>
+		<% vehicleReviews.forEach((review) => { %>
+			<article class="card glass-panel" style="margin: 1rem 0;">
+				<p><%= review.reviewText || '' %></p>
+				<p>
+					By <%= review.accountFirstName || 'Customer' %>
+					on <%= review.reviewDate ? new Date(review.reviewDate).toLocaleDateString() : 'N/A' %>
+				</p>
+
+				<% const currentUserId = Number(user && (user.id ?? user.account_id)); %>
+				<% const reviewOwnerId = Number(review.accountId); %>
+				<% const canEditOwn = Number.isFinite(currentUserId) && currentUserId === reviewOwnerId; %>
+				<% const canModerate = role === 'Employee' || role === 'Admin'; %>
+
+				<% if (canEditOwn || canModerate) { %>
+					<form action="/reviews/<%= review.reviewId %>/delete" method="POST" style="display:inline-block;">
+						<input type="hidden" name="returnTo" value="/catalog/<%= v.slug || v.id || '' %>">
+						<button type="submit" class="btn">Delete Review</button>
+					</form>
+				<% } %>
+			</article>
+		<% }) %>
+	<% } else { %>
+		<p>No reviews have been posted for this vehicle yet.</p>
+	<% } %>
+</section>
+
 <%- include('../partials/footer') %>

@@ -11,7 +11,8 @@
         <table style="width:100%; border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th style="text-align:left; padding: 0.5rem;">Subject</th>
+                    <th style="text-align:left; padding: 0.5rem;">Sender</th>
+                    <th style="text-align:left; padding: 0.5rem;">Email</th>
                     <th style="text-align:left; padding: 0.5rem;">Message</th>
                     <th style="text-align:left; padding: 0.5rem;">Submitted</th>
                 </tr>
@@ -19,7 +20,8 @@
             <tbody>
                 <% messages.forEach((item) => { %>
                     <tr>
-                        <td style="padding: 0.5rem;"><%= item.subject %></td>
+                        <td style="padding: 0.5rem;"><%= item.senderName %></td>
+                        <td style="padding: 0.5rem;"><%= item.senderEmail %></td>
                         <td style="padding: 0.5rem;"><%= item.message %></td>
                         <td style="padding: 0.5rem;"><%= item.submitted ? new Date(item.submitted).toLocaleString() : 'N/A' %></td>
                     </tr>

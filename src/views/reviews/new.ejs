@@ -7,15 +7,18 @@
 
 <section class="card glass-panel">
 	<form action="/reviews" method="POST">
+		<% const selectedInvId = typeof inv_id !== 'undefined' ? inv_id : ''; %>
+		<% const allVehicles = Array.isArray(vehicleOptions) ? vehicleOptions : []; %>
+
 		<label for="inv_id">Vehicle</label>
-		<input
-			type="text"
-			id="inv_id"
-			name="inv_id"
-			value="<%= typeof inv_id !== 'undefined' ? inv_id : '' %>"
-			placeholder="Vehicle ID"
-			required
-		>
+		<select id="inv_id" name="inv_id" required>
+			<option value="">Select a vehicle</option>
+			<% allVehicles.forEach((vehicle) => { %>
+				<option value="<%= vehicle.id %>" <%= String(selectedInvId) === String(vehicle.id) ? 'selected' : '' %>>
+					<%= vehicle.name %>
+				</option>
+			<% }) %>
+		</select>
 
 		<label for="review_text">Your Review</label>
 		<textarea

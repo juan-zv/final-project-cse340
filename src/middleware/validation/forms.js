@@ -66,12 +66,19 @@ const loginValidation = [
 ];
 
 const contactValidation = [
-    body('subject')
+    body('sender_name')
         .trim()
-        .isLength({ min: 2, max: 255 })
-        .withMessage('Subject must be between 2 and 255 characters')
-        .matches(/^[a-zA-Z0-9\s\-.,!?]+$/)
-        .withMessage('Subject contains invalid characters'),
+        .isLength({ min: 2, max: 100 })
+        .withMessage('Name must be between 2 and 100 characters')
+        .matches(/^[a-zA-Z\s'-]+$/)
+        .withMessage('Name contains invalid characters'),
+    body('sender_email')
+        .trim()
+        .isEmail()
+        .withMessage('Please provide a valid email address')
+        .isLength({ max: 150 })
+        .withMessage('Email address is too long')
+        .normalizeEmail(),
     body('message')
         .trim()
         .isLength({ min: 10, max: 2000 })
@@ -101,8 +108,9 @@ const reviewValidation = [
 
 const serviceRequestValidation = [
     body('inv_id')
-        .optional({ checkFalsy: true })
         .trim()
+        .notEmpty()
+        .withMessage('Please select a vehicle')
         .isInt({ min: 1 })
         .withMessage('Vehicle ID must be a valid number'),
     body('service_type')

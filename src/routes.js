@@ -15,13 +15,10 @@ import {
 import {
     buildServicesList,
     buildServiceRequest,
-    submitServiceRequest
-} from './controllers/services/index.js';
-import {
-    buildServiceRequestsList,
+    submitServiceRequest,
     buildServiceRequestEdit,
     updateServiceRequest
-} from './controllers/service-requests/index.js';
+} from './controllers/services/index.js';
 import { buildAdminDashboard, buildEmployeesList } from './controllers/admin/index.js';
 import { buildEmployeeDashboard, buildContactSubmissions } from './controllers/employee/index.js';
 import {
@@ -101,14 +98,16 @@ router.post('/reviews/:reviewId/edit', requireLogin, reviewValidation, updateRev
 router.post('/reviews/:reviewId/delete', requireLogin, deleteReviewById);
 
 // Services
-router.get('/services', buildServicesList);
+router.get('/services', requireLogin, buildServicesList);
 router.get('/services/request', requireLogin, buildServiceRequest);
 router.post('/services/request', requireLogin, serviceRequestValidation, submitServiceRequest);
 
 // Service request history and updates
-router.get('/service-requests', requireLogin, buildServiceRequestsList);
-router.get('/service-requests/:requestId/edit', requireLogin, buildServiceRequestEdit);
-router.post('/service-requests/:requestId/edit', requireLogin, serviceRequestUpdateValidation, updateServiceRequest);
+router.get('/service-requests', requireLogin, (req, res) => res.redirect('/services'));
+router.get('/service-requests/:requestId/edit', requireLogin, (req, res) => res.redirect(`/services/${req.params.requestId}/edit`));
+router.post('/service-requests/:requestId/edit', requireLogin, (req, res) => res.redirect(307, `/services/${req.params.requestId}/edit`));
+router.get('/services/:requestId/edit', requireLogin, buildServiceRequestEdit);
+router.post('/services/:requestId/edit', requireLogin, serviceRequestUpdateValidation, updateServiceRequest);
 
 // Export the router to be used in the main app
 export default router;

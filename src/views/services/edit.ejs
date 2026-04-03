@@ -6,7 +6,7 @@
 </section>
 
 <section class="card glass-panel">
-	<form action="/service-requests/<%= request && request.requestId ? request.requestId : '' %>/edit" method="POST">
+	<form action="/services/<%= request && request.requestId ? request.requestId : '' %>/edit" method="POST">
 		<label for="service_status">Status</label>
 		<select id="service_status" name="service_status" required>
 			<option value="Submitted" <%= request && request.serviceStatus === 'Submitted' ? 'selected' : '' %>>Submitted</option>
@@ -24,7 +24,7 @@
 		><%= request && request.requestNotes ? request.requestNotes : '' %></textarea>
 
 		<button type="submit" class="btn btn-primary">Save Update</button>
-		<a href="/service-requests" class="btn">Back to Requests</a>
+		<a href="/services" class="btn">Back to Services</a>
 	</form>
 </section>
 

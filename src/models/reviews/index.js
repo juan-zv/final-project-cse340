@@ -11,7 +11,8 @@ const mapReview = (row) => ({
     accountLastName: row.account_lastname,
     invYear: row.inv_year,
     invMake: row.inv_make,
-    invModel: row.inv_model
+    invModel: row.inv_model,
+    vehicleName: [row.inv_year, row.inv_make, row.inv_model].filter(Boolean).join(' ')
 });
 
 const getReviewsByVehicleId = async (invId) => {

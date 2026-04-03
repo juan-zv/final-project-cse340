@@ -17,6 +17,7 @@
                 <li><a href="/contact">Contact</a></li>
                 
                 <% if (user) { %>
+                        <li><a href="/services/">Services</a></li>
                     <% if (role === 'Admin') { %>
                         <li><a href="/dashboard">Owner Dashboard</a></li>
                     <% } else if (role === 'Employee') { %>
