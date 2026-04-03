@@ -36,10 +36,10 @@ const getInventory = async (category = '', sortBy = 'newest') => {
                 i.inv_price,
                 i.inv_miles,
                 i.is_available,
-                c.classification_name
+                c.category_name
             FROM inventory i
-            JOIN categories c ON i.classification_id = c.classification_id
-            WHERE LOWER(c.classification_name) = LOWER($1)
+            JOIN categories c ON i.category_id = c.category_id
+            WHERE LOWER(c.category_name) = LOWER($1)
             ORDER BY ${orderBy}
         `
         : `
@@ -54,9 +54,9 @@ const getInventory = async (category = '', sortBy = 'newest') => {
                 i.inv_price,
                 i.inv_miles,
                 i.is_available,
-                c.classification_name
+                c.category_name
             FROM inventory i
-            JOIN categories c ON i.classification_id = c.classification_id
+            JOIN categories c ON i.category_id = c.category_id
             ORDER BY ${orderBy}
         `;
 
@@ -77,7 +77,7 @@ const getInventory = async (category = '', sortBy = 'newest') => {
         miles: row.inv_miles,
         status: row.is_available ? 'Available' : 'Unavailable',
         availability: row.is_available ? 'Available' : 'Unavailable',
-        category: row.classification_name
+        category: row.category_name
     }));
 };
 
@@ -102,9 +102,9 @@ const getVehicleByRouteId = async (slugId) => {
             i.inv_price,
             i.inv_miles,
             i.is_available,
-            c.classification_name
+            c.category_name
         FROM inventory i
-        JOIN categories c ON i.classification_id = c.classification_id
+        JOIN categories c ON i.category_id = c.category_id
         WHERE i.inv_id = $1
         LIMIT 1
     `;
@@ -128,7 +128,7 @@ const getVehicleByRouteId = async (slugId) => {
         price: row.inv_price,
         miles: row.inv_miles,
         status: row.is_available ? 'Available' : 'Unavailable',
-        category: row.classification_name
+        category: row.category_name
     };
 };
 

@@ -71,20 +71,20 @@ const syncSampleInventory = async () => {
     }
 
     const query = `
-        WITH seeded_inventory (inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, classification_name) AS (
+        WITH seeded_inventory (inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, category_name) AS (
             VALUES
-                ('Ford', 'F-150', '2018', 'Well-kept full-size pickup with proven durability and towing power.', '/images/ford-f150-2018.png', '/images/ford-f150-2018-thumb.png', 31995, 74500, 'Trucks'),
-                ('Chevrolet', 'Silverado 1500', '2017', 'Popular used truck with strong V8 capability and roomy cabin.', '/images/chevy-silverado-2017.png', '/images/chevy-silverado-2017-thumb.png', 29995, 81200, 'Trucks'),
-                ('Ram', '1500', '2019', 'Comfortable work truck with a smooth ride and strong resale value.', '/images/ram-1500-2019.png', '/images/ram-1500-2019-thumb.png', 34995, 63800, 'Trucks'),
-                ('Honda', 'Odyssey', '2018', 'Reliable family van with sliding doors, space, and easy access.', '/images/honda-odyssey-2018.png', '/images/honda-odyssey-2018-thumb.png', 23995, 69100, 'Vans'),
-                ('Toyota', 'Sienna', '2017', 'Dependable minivan with great space for families and road trips.', '/images/toyota-sienna-2017.png', '/images/toyota-sienna-2017-thumb.png', 22995, 74800, 'Vans'),
-                ('Dodge', 'Grand Caravan', '2016', 'Budget-friendly used van with flexible seating and cargo room.', '/images/dodge-grand-caravan-2016.png', '/images/dodge-grand-caravan-2016-thumb.png', 16995, 95400, 'Vans'),
-                ('Toyota', 'Camry', '2018', 'Well-known sedan with strong reliability and low ownership costs.', '/images/toyota-camry-2018.png', '/images/toyota-camry-2018-thumb.png', 19995, 66300, 'Cars'),
-                ('Honda', 'Civic', '2017', 'Compact car with excellent fuel economy and everyday comfort.', '/images/honda-civic-2017.png', '/images/honda-civic-2017-thumb.png', 17995, 72100, 'Cars'),
-                ('Nissan', 'Altima', '2019', 'Popular midsize sedan with a comfortable ride and modern features.', '/images/nissan-altima-2019.png', '/images/nissan-altima-2019-thumb.png', 18995, 58900, 'Cars'),
-                ('Toyota', 'RAV4', '2018', 'Practical used SUV with strong reliability and high demand.', '/images/toyota-rav4-2018.png', '/images/toyota-rav4-2018-thumb.png', 24995, 70200, 'SUVs'),
-                ('Honda', 'CR-V', '2017', 'Compact SUV known for comfort, space, and good fuel economy.', '/images/honda-crv-2017.png', '/images/honda-crv-2017-thumb.png', 22995, 76900, 'SUVs'),
-                ('Ford', 'Escape', '2016', 'Affordable used SUV with good versatility and easy city driving.', '/images/ford-escape-2016.png', '/images/ford-escape-2016-thumb.png', 15995, 88200, 'SUVs')
+                ('Ford', 'F-150', '2018', 'Well-kept full-size pickup with proven durability and towing power.', '/images/ford-f-150.jpg', '/images/ford-f-150.jpg', 31995, 74500, 'Trucks'),
+                ('Chevrolet', 'Silverado 1500', '2017', 'Popular used truck with strong V8 capability and roomy cabin.', '/images/chevrolet-silverado-1500.jpg', '/images/chevrolet-silverado-1500.jpg', 29995, 81200, 'Trucks'),
+                ('Ram', '1500', '2019', 'Comfortable work truck with a smooth ride and strong resale value.', '/images/ram-1500.jpg', '/images/ram-1500.jpg', 34995, 63800, 'Trucks'),
+                ('Honda', 'Odyssey', '2018', 'Reliable family van with sliding doors, space, and easy access.', '/images/honda-odyssey.jpg', '/images/honda-odyssey.jpg', 23995, 69100, 'Vans'),
+                ('Toyota', 'Sienna', '2017', 'Dependable minivan with great space for families and road trips.', '/images/toyota-sienna.jpg', '/images/toyota-sienna.jpg', 22995, 74800, 'Vans'),
+                ('Dodge', 'Grand Caravan', '2016', 'Budget-friendly used van with flexible seating and cargo room.', '/images/dodge-grand-caravan.webp', '/images/dodge-grand-caravan.webp', 16995, 95400, 'Vans'),
+                ('Toyota', 'Camry', '2018', 'Well-known sedan with strong reliability and low ownership costs.', '/images/toyota-camry.jpg', '/images/toyota-camry.jpg', 19995, 66300, 'Cars'),
+                ('Honda', 'Civic', '2017', 'Compact car with excellent fuel economy and everyday comfort.', '/images/honda-civic.webp', '/images/honda-civic.webp', 17995, 72100, 'Cars'),
+                ('Nissan', 'Altima', '2019', 'Popular midsize sedan with a comfortable ride and modern features.', '/images/nissan-altima.webp', '/images/nissan-altima.webp', 18995, 58900, 'Cars'),
+                ('Toyota', 'RAV4', '2018', 'Practical used SUV with strong reliability and high demand.', '/images/toyota-rav4.jpg', '/images/toyota-rav4.jpg', 24995, 70200, 'SUVs'),
+                ('Honda', 'CR-V', '2017', 'Compact SUV known for comfort, space, and good fuel economy.', '/images/honda-cr-v.jpg', '/images/honda-cr-v.jpg', 22995, 76900, 'SUVs'),
+                ('Ford', 'Escape', '2016', 'Affordable used SUV with good versatility and easy city driving.', '/images/ford-escape.jpg', '/images/ford-escape.jpg', 15995, 88200, 'SUVs')
         )
         INSERT INTO inventory (
             inv_make,
@@ -95,7 +95,7 @@ const syncSampleInventory = async () => {
             inv_thumbnail,
             inv_price,
             inv_miles,
-            classification_id
+            category_id
         )
         SELECT
             s.inv_make,
@@ -106,9 +106,9 @@ const syncSampleInventory = async () => {
             s.inv_thumbnail,
             s.inv_price,
             s.inv_miles,
-            c.classification_id
+            c.category_id
         FROM seeded_inventory s
-        JOIN classifications c ON c.classification_name = s.classification_name
+        JOIN categories c ON c.category_name = s.category_name
     `;
 
     await db.query(query);
@@ -117,7 +117,7 @@ const syncSampleInventory = async () => {
 
 /**
  * Sets up the database by running the seed.sql file if needed.
- * Checks if inventory/classification data exists before reseeding.
+ * Checks if categories and inventory data exist before reseeding.
  */
 const setupDatabase = async () => {
     // First check if the expected table exists to avoid relation-not-found errors.
@@ -140,7 +140,7 @@ const setupDatabase = async () => {
         return true;
     }
     
-    // No classification data found - run full seed
+    // No category data found - run full seed
     console.log('Seeding database...');
     const seedPath = join(__dirname, 'sql', 'seed.sql');
     const seedSQL = readSqlFile(seedPath);
