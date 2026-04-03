@@ -44,6 +44,19 @@
     color: rgba(243, 244, 246, 0.95);
 }
 
+.field-error {
+    margin-top: -0.65rem;
+    margin-bottom: 0.5rem;
+    min-height: 1.1rem;
+    color: #ffb3b3;
+    font-size: 0.88rem;
+}
+
+.contact-form .is-invalid {
+    border-color: rgba(255, 122, 122, 0.75);
+    box-shadow: 0 0 8px rgba(255, 122, 122, 0.25);
+}
+
 .contact-form .btn {
     margin-top: 0.4rem;
     width: fit-content;

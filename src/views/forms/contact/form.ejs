@@ -9,7 +9,7 @@
     <section class="contact-layout">
         <article class="contact-panel">
             <h2>Send a Message</h2>
-            <form action="/contact" method="POST" class="contact-form" novalidate>
+            <form action="/contact" method="POST" class="contact-form" id="contactForm" novalidate>
                 <% const loggedInName = user && user.name ? user.name : ''; %>
                 <% const loggedInEmail = user && user.email ? user.email : ''; %>
 
@@ -21,9 +21,12 @@
                     value="<%= loggedInName %>"
                     minlength="2"
                     maxlength="100"
+                    pattern="[A-Za-z\s'\-]+"
                     required
                     placeholder="Enter your full name"
+                    aria-describedby="sender_name_error"
                 >
+                <p id="sender_name_error" class="field-error" aria-live="polite"></p>
 
                 <label for="sender_email">Email</label>
                 <input
@@ -34,7 +37,9 @@
                     maxlength="150"
                     required
                     placeholder="you@example.com"
+                    aria-describedby="sender_email_error"
                 >
+                <p id="sender_email_error" class="field-error" aria-live="polite"></p>
 
                 <label for="message">Message</label>
                 <textarea
@@ -45,7 +50,9 @@
                     maxlength="2000"
                     required
                     placeholder="Share details about your request..."
+                    aria-describedby="message_error"
                 ></textarea>
+                <p id="message_error" class="field-error" aria-live="polite"></p>
 
                 <button type="submit" class="btn btn-primary">Submit Message</button>
             </form>
@@ -61,5 +68,73 @@
         </aside>
     </section>
 </div>
+
+<script>
+    (() => {
+        const form = document.getElementById('contactForm');
+        if (!form) return;
+
+        const fields = {
+            sender_name: {
+                element: document.getElementById('sender_name'),
+                error: document.getElementById('sender_name_error'),
+                validate: (value) => {
+                    if (!value) return 'Name is required.';
+                    if (value.length < 2 || value.length > 100) return 'Name must be between 2 and 100 characters.';
+                    if (!/^[A-Za-z\s'\-]+$/.test(value)) return 'Name can only include letters, spaces, apostrophes, and hyphens.';
+                    return '';
+                }
+            },
+            sender_email: {
+                element: document.getElementById('sender_email'),
+                error: document.getElementById('sender_email_error'),
+                validate: (value) => {
+                    if (!value) return 'Email is required.';
+                    if (value.length > 150) return 'Email address is too long.';
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Please provide a valid email address.';
+                    return '';
+                }
+            },
+            message: {
+                element: document.getElementById('message'),
+                error: document.getElementById('message_error'),
+                validate: (value) => {
+                    if (!value) return 'Message is required.';
+                    if (value.length < 10 || value.length > 2000) return 'Message must be between 10 and 2000 characters.';
+                    return '';
+                }
+            }
+        };
+
+        const validateField = (key) => {
+            const field = fields[key];
+            const normalizedValue = field.element.value.trim();
+            const message = field.validate(normalizedValue);
+
+            field.element.value = normalizedValue;
+            field.error.textContent = message;
+            field.element.classList.toggle('is-invalid', Boolean(message));
+
+            return !message;
+        };
+
+        Object.keys(fields).forEach((key) => {
+            const { element } = fields[key];
+            element.addEventListener('blur', () => validateField(key));
+            element.addEventListener('input', () => {
+                if (element.classList.contains('is-invalid')) {
+                    validateField(key);
+                }
+            });
+        });
+
+        form.addEventListener('submit', (event) => {
+            const isValid = Object.keys(fields).every((key) => validateField(key));
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    })();
+</script>
 
 <%- include('../../partials/footer') %>

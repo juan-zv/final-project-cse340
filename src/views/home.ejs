@@ -3,11 +3,12 @@
 <div class="home-container">
     <section class="hero">
         <div class="hero-content">
-            <h1>Find Your Next Vehicle With Confidence</h1>
+            <h1>Welcome to Juansito's Car Dealership</h1>
+            <p>Welcome to Juansito's, where drivers find dependable vehicles, honest pricing, and trusted support.</p>
             <p>Browse quality inventory, leave verified reviews, and manage service requests from one place.</p>
             <div class="hero-metrics">
                 <span class="metric-pill">Transparent Pricing</span>
-                <span class="metric-pill">Role-Based Dashboards</span>
+                <span class="metric-pill">Fast Online Support</span>
                 <span class="metric-pill">Service Tracking</span>
             </div>
             <nav class="hero-nav">
@@ -61,34 +62,13 @@
 
     <section class="contact-cta">
         <h2>Need Maintenance or Have Questions?</h2>
-        <p>Contact our team directly or open a service request to track updates from start to finish.</p>
+        <p>The Juansito's team is ready to help. Contact us directly or open a service request to track updates from start to finish.</p>
         <div class="cta-links">
             <a href="/contact" class="btn btn-secondary">Contact Us</a>
             <a href="<%= isLoggedIn ? '/services/request' : '/login' %>" class="btn btn-outline"><%= isLoggedIn ? 'Request Service' : 'Log In to Request Service' %></a>
         </div>
     </section>
 
-    <section class="categories">
-        <h2>Account Types and Access</h2>
-        <div class="category-grid">
-            <article class="category-card">
-                <h3>Public Visitor</h3>
-                <p>Browse categories, view vehicle details, pricing, and send contact messages.</p>
-            </article>
-            <article class="category-card">
-                <h3>Registered User</h3>
-                <p>Leave reviews, manage your reviews, submit service requests, and track status history.</p>
-            </article>
-            <article class="category-card">
-                <h3>Employee</h3>
-                <p>Update vehicle details, moderate reviews, and manage service progress with notes.</p>
-            </article>
-            <article class="category-card">
-                <h3>Admin</h3>
-                <p>Full control over categories, vehicles, team accounts, and system-wide activity data.</p>
-            </article>
-        </div>
-    </section>
 </div>
 
 <%- include('partials/footer') %>

@@ -157,6 +157,28 @@ const updateVehicle = async (invId, vehicle) => {
     return result.rows[0] || null;
 };
 
+const updateVehicleEmployeeDetails = async (invId, vehicle) => {
+    const query = `
+        UPDATE inventory
+        SET
+            inv_description = $1,
+            inv_price = $2,
+            is_available = $3
+        WHERE inv_id = $4
+        RETURNING inv_id
+    `;
+
+    const params = [
+        vehicle.invDescription,
+        vehicle.invPrice,
+        vehicle.isAvailable,
+        invId
+    ];
+
+    const result = await db.query(query, params);
+    return result.rows[0] || null;
+};
+
 const deleteVehicle = async (invId) => {
     const query = `
         DELETE FROM inventory
@@ -309,6 +331,7 @@ export {
     getAllVehiclesForAdmin,
     createVehicle,
     updateVehicle,
+    updateVehicleEmployeeDetails,
     deleteVehicle,
     deleteContactMessage,
     getSystemActivity

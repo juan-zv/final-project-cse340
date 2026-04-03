@@ -1,4 +1,5 @@
 import { getAllContactForms } from '../../models/forms/contact.js';
+import { getAllVehiclesForAdmin, updateVehicleEmployeeDetails } from '../../models/admin/index.js';
 
 export const buildEmployeeDashboard = async (req, res, next) => {
 	try {
@@ -11,7 +12,7 @@ export const buildEmployeeDashboard = async (req, res, next) => {
 				{
 					title: 'Vehicle Editing',
 					description: 'Update pricing, descriptions, and availability for listed vehicles.',
-					primaryLink: '/catalog',
+					primaryLink: '/employee/vehicles',
 					primaryLabel: 'Open Vehicle Inventory',
 					secondaryLink: '/dashboard',
 					secondaryLabel: 'Back to Shared Dashboard'
@@ -37,6 +38,54 @@ export const buildEmployeeDashboard = async (req, res, next) => {
 			]
 		});
 	} catch (error) {
+		next(error);
+	}
+};
+
+export const buildEmployeeVehicleEditing = async (req, res, next) => {
+	try {
+		const vehicles = await getAllVehiclesForAdmin();
+		res.render('employee/vehicles', {
+			title: 'Employee Vehicle Editing',
+			vehicles
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const updateEmployeeVehicleDetailsAction = async (req, res, next) => {
+	try {
+		const invId = Number.parseInt(req.params.invId, 10);
+		const invDescription = String(req.body.inv_description || '').trim();
+		const invPrice = Number.parseFloat(req.body.inv_price || '0');
+		const isAvailable = String(req.body.is_available || '').toLowerCase() === 'true';
+
+		if (!Number.isInteger(invId) || invId < 1) {
+			req.flash('error', 'Invalid vehicle update request.');
+			return res.redirect('/employee/vehicles');
+		}
+
+		if (!invDescription) {
+			req.flash('error', 'Vehicle description is required.');
+			return res.redirect('/employee/vehicles');
+		}
+
+		if (!Number.isFinite(invPrice) || invPrice < 0) {
+			req.flash('error', 'Vehicle price must be a valid non-negative number.');
+			return res.redirect('/employee/vehicles');
+		}
+
+		await updateVehicleEmployeeDetails(invId, {
+			invDescription,
+			invPrice,
+			isAvailable
+		});
+
+		req.flash('success', 'Vehicle details updated successfully.');
+		res.redirect('/employee/vehicles');
+	} catch (error) {
+		req.flash('error', 'Unable to update vehicle details.');
 		next(error);
 	}
 };

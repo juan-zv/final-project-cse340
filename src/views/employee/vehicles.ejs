@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Employee Vehicle Editing</h1>
+	<p>Update vehicle description, price, and availability.</p>
+</section>
+
+<section class="card glass-panel">
+	<% const vehicleItems = Array.isArray(vehicles) ? vehicles : []; %>
+	<% if (vehicleItems.length > 0) { %>
+		<% vehicleItems.forEach((vehicle) => { %>
+			<article class="card glass-panel" style="margin-bottom: 1rem;">
+				<h3><%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %></h3>
+				<form action="/employee/vehicles/<%= vehicle.inv_id %>/edit" method="POST" style="display:grid; gap:0.5rem;">
+					<label for="inv_description_<%= vehicle.inv_id %>">Description</label>
+					<textarea id="inv_description_<%= vehicle.inv_id %>" name="inv_description" required><%= vehicle.inv_description %></textarea>
+
+					<label for="inv_price_<%= vehicle.inv_id %>">Price</label>
+					<input id="inv_price_<%= vehicle.inv_id %>" name="inv_price" type="number" min="0" step="0.01" value="<%= vehicle.inv_price %>" required>
+
+					<label for="is_available_<%= vehicle.inv_id %>">Availability</label>
+					<select id="is_available_<%= vehicle.inv_id %>" name="is_available" required>
+						<option value="true" <%= vehicle.is_available ? 'selected' : '' %>>Available</option>
+						<option value="false" <%= !vehicle.is_available ? 'selected' : '' %>>Unavailable</option>
+					</select>
+
+					<div>
+						<button type="submit" class="btn btn-primary">Save Changes</button>
+					</div>
+				</form>
+			</article>
+		<% }) %>
+	<% } else { %>
+		<p>No vehicles found.</p>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

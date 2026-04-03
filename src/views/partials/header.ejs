@@ -3,36 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= typeof title !== 'undefined' ? title : 'Car Dealership' %></title>
+    <title><%= typeof title !== 'undefined' ? title : "Juansito's" %></title>
     <link rel="stylesheet" href="/css/main.css">
     <%- typeof renderStyles === 'function' ? renderStyles() : '' %>
 </head>
 <body>
+    <% const path = (typeof currentPath === 'string' && currentPath) ? currentPath : '/'; %>
+    <% const isActive = (basePath) => path === basePath || path.startsWith(`${basePath}/`); %>
     <header>
-        <nav>
-            <div class="logo"><a href="/">Car Dealership</a></div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/catalog">Browse Vehicles</a></li>
-                <li><a href="/contact">Contact</a></li>
+        <nav class="site-nav" aria-label="Primary Navigation">
+            <div class="logo"><a href="/">Juansito's</a></div>
+            <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav-links" aria-label="Toggle navigation menu">
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+            </button>
+            <ul class="nav-links" id="primary-nav-links">
+                <li><a href="/" class="<%= path === '/' ? 'is-active' : '' %>" <%= path === '/' ? 'aria-current="page"' : '' %>>Home</a></li>
+                <li><a href="/catalog" class="<%= isActive('/catalog') ? 'is-active' : '' %>" <%= isActive('/catalog') ? 'aria-current="page"' : '' %>>Browse Vehicles</a></li>
+                <li><a href="/contact" class="<%= isActive('/contact') ? 'is-active' : '' %>" <%= isActive('/contact') ? 'aria-current="page"' : '' %>>Contact</a></li>
                 
                 <% if (user) { %>
-                        <li><a href="/services/">Services</a></li>
+                        <li><a href="/services/" class="<%= isActive('/services') ? 'is-active' : '' %>" <%= isActive('/services') ? 'aria-current="page"' : '' %>>Services</a></li>
                     <% if (role === 'Admin') { %>
-                        <li><a href="/dashboard">Admin Dashboard</a></li>
+                        <li><a href="/dashboard" class="<%= isActive('/dashboard') || isActive('/admin') ? 'is-active' : '' %>" <%= isActive('/dashboard') || isActive('/admin') ? 'aria-current="page"' : '' %>>Admin Dashboard</a></li>
                     <% } else if (role === 'Employee') { %>
-                        <li><a href="/dashboard">Employee Dashboard</a></li>
+                        <li><a href="/dashboard" class="<%= isActive('/dashboard') || isActive('/employee') ? 'is-active' : '' %>" <%= isActive('/dashboard') || isActive('/employee') ? 'aria-current="page"' : '' %>>Employee Dashboard</a></li>
                     <% } else { %>
-                        <li><a href="/dashboard">My Dashboard</a></li>
+                        <li><a href="/dashboard" class="<%= isActive('/dashboard') || isActive('/user') ? 'is-active' : '' %>" <%= isActive('/dashboard') || isActive('/user') ? 'aria-current="page"' : '' %>>My Dashboard</a></li>
                     <% } %>
                     <li><a href="/logout">Log Out</a></li>
                 <% } else { %>
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/register">Register</a></li>
+                    <li><a href="/login" class="<%= isActive('/login') ? 'is-active' : '' %>" <%= isActive('/login') ? 'aria-current="page"' : '' %>>Login</a></li>
+                    <li><a href="/register" class="<%= isActive('/register') ? 'is-active' : '' %>" <%= isActive('/register') ? 'aria-current="page"' : '' %>>Register</a></li>
                 <% } %>
             </ul>
         </nav>
     </header>
+    <script>
+        (() => {
+            const nav = document.querySelector('.site-nav');
+            if (!nav) return;
+
+            const toggle = nav.querySelector('.nav-toggle');
+            const links = nav.querySelector('.nav-links');
+            if (!toggle || !links) return;
+
+            toggle.addEventListener('click', () => {
+                const willOpen = !links.classList.contains('is-open');
+                links.classList.toggle('is-open', willOpen);
+                toggle.setAttribute('aria-expanded', String(willOpen));
+            });
+        })();
+    </script>
     <main>
         <% const flashMessages = typeof flash === 'function' ? flash() : { success: [], error: [], warning: [], info: [] }; %>
 

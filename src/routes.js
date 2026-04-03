@@ -33,7 +33,12 @@ import {
     buildSystemActivity,
     deleteContactMessageAction
 } from './controllers/admin/index.js';
-import { buildEmployeeDashboard, buildContactSubmissions } from './controllers/employee/index.js';
+import {
+    buildEmployeeDashboard,
+    buildContactSubmissions,
+    buildEmployeeVehicleEditing,
+    updateEmployeeVehicleDetailsAction
+} from './controllers/employee/index.js';
 import { buildUserDashboard } from './controllers/user/index.js';
 import {
     reviewValidation,
@@ -114,6 +119,8 @@ router.post('/admin/system/contact-messages/:messageId/delete', requireAdmin, de
 router.post('/admin/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
+router.get('/employee/vehicles', requireEmployee, buildEmployeeVehicleEditing);
+router.post('/employee/vehicles/:invId/edit', requireEmployee, updateEmployeeVehicleDetailsAction);
 router.get('/user/dashboard', requireLogin, buildUserDashboard);
 
 // Reviews

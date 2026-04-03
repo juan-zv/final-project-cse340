@@ -71,6 +71,7 @@ const addLocalVariables = (req, res, next) => {
 
     // Make req.query available to all templates
     res.locals.queryParams = { ...req.query };
+    res.locals.currentPath = req.path || '/';
 
     // Set greeting based on time of day
     res.locals.greeting = `<p>${getCurrentGreeting()}</p>`;

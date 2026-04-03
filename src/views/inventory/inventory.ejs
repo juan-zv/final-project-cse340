@@ -57,9 +57,6 @@
 				<p class="status">Status: <%= v.status %></p>
 				<p><strong>$<%= v.price %></strong></p>
 				<a href="/catalog/<%= v.slug %>" class="btn">View Details</a>
-				<% if (isLoggedIn) { %>
-					<a href="/dashboard" class="btn" style="margin-left: 0.5rem;">Save to Dashboard</a>
-				<% } %>
 			</div>
 		<% }) %>
 	<% } else { %>
