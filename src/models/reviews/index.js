@@ -28,6 +28,21 @@ const getReviewsByVehicleId = async (invId) => {
     return result.rows.map(mapReview);
 };
 
+const getAllReviews = async () => {
+    const query = `
+        SELECT
+            r.*, a.account_firstname, a.account_lastname,
+            i.inv_year, i.inv_make, i.inv_model
+        FROM reviews r
+        JOIN accounts a ON r.account_id = a.account_id
+        JOIN inventory i ON r.inv_id = i.inv_id
+        ORDER BY r.review_date DESC
+    `;
+
+    const result = await db.query(query);
+    return result.rows.map(mapReview);
+};
+
 const getReviewsByAccountId = async (accountId) => {
     const query = `
         SELECT r.*, i.inv_year, i.inv_make, i.inv_model
@@ -88,6 +103,7 @@ const deleteReview = async (reviewId) => {
 
 export {
     getReviewsByVehicleId,
+    getAllReviews,
     getReviewsByAccountId,
     getReviewById,
     addReview,

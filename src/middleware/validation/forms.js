@@ -126,7 +126,7 @@ const serviceRequestValidation = [
 const serviceRequestUpdateValidation = [
     body('service_status')
         .trim()
-        .isIn(['Submitted', 'In Progress', 'Completed'])
+        .isIn(['Open', 'Submitted', 'In Progress', 'Completed'])
         .withMessage('Invalid service request status'),
     body('request_notes')
         .optional({ checkFalsy: true })

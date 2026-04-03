@@ -18,6 +18,38 @@
 </section>
 
 <section class="card glass-panel">
+	<% const filterValues = (typeof filters !== 'undefined' && filters) ? filters : {}; %>
+	<form method="GET" action="/services" style="display:grid; gap:0.75rem;">
+		<label for="sortBy">Sort By</label>
+		<select id="sortBy" name="sortBy">
+			<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
+			<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
+			<option value="status" <%= filterValues.sortBy === 'status' ? 'selected' : '' %>>Status</option>
+			<option value="type" <%= filterValues.sortBy === 'type' ? 'selected' : '' %>>Service Type</option>
+		</select>
+
+		<label for="status">Filter Status</label>
+		<select id="status" name="status">
+			<option value="" <%= !filterValues.status ? 'selected' : '' %>>All</option>
+			<option value="open" <%= String(filterValues.status || '').toLowerCase() === 'open' ? 'selected' : '' %>>Open</option>
+			<option value="in progress" <%= String(filterValues.status || '').toLowerCase() === 'in progress' ? 'selected' : '' %>>In Progress</option>
+			<option value="completed" <%= String(filterValues.status || '').toLowerCase() === 'completed' ? 'selected' : '' %>>Completed</option>
+		</select>
+
+		<label for="serviceType">Filter Service Type</label>
+		<input id="serviceType" name="serviceType" type="text" value="<%= filterValues.serviceType || '' %>" placeholder="Oil, brake, tire, etc.">
+
+		<label for="q">Keyword</label>
+		<input id="q" name="q" type="text" value="<%= filterValues.q || '' %>" placeholder="Search notes, vehicle, or requester">
+
+		<div>
+			<button type="submit" class="btn btn-primary">Apply</button>
+			<a href="/services" class="btn">Reset</a>
+		</div>
+	</form>
+</section>
+
+<section class="card glass-panel">
 	<h2>Your Service Requests</h2>
 	<% const requests = Array.isArray(serviceRequests) ? serviceRequests : []; %>
 	<% if (requests.length > 0) { %>
@@ -36,7 +68,7 @@
 				<% requests.forEach((request) => { %>
 					<tr>
 						<td style="padding: 0.5rem;"><%= request.serviceType || 'General Service' %></td>
-						<td style="padding: 0.5rem;"><%= request.serviceStatus || 'Submitted' %></td>
+						<td style="padding: 0.5rem;"><%= request.displayStatus || request.serviceStatus || 'Open' %></td>
 						<td style="padding: 0.5rem;"><%= [request.invYear, request.invMake, request.invModel].filter(Boolean).join(' ') || 'Not specified' %></td>
 						<td style="padding: 0.5rem;"><%= request.requestNotes || 'No notes yet' %></td>
 						<td style="padding: 0.5rem;"><%= request.updatedAt ? new Date(request.updatedAt).toLocaleDateString() : (request.createdAt ? new Date(request.createdAt).toLocaleDateString() : 'N/A') %></td>

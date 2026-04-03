@@ -6,11 +6,39 @@
 </section>
 
 <section class="card glass-panel">
+	<% const filterValues = (typeof filters !== 'undefined' && filters) ? filters : {}; %>
+	<form method="GET" action="/employee/contact-form-submissions" style="display:grid; gap:0.75rem;">
+		<label for="sortBy">Sort By</label>
+		<select id="sortBy" name="sortBy">
+			<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
+			<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
+			<option value="sender" <%= filterValues.sortBy === 'sender' ? 'selected' : '' %>>Sender</option>
+		</select>
+
+		<label for="readStatus">Filter Status</label>
+		<select id="readStatus" name="readStatus">
+			<option value="" <%= !filterValues.readStatus ? 'selected' : '' %>>All</option>
+			<option value="open" <%= String(filterValues.readStatus || '').toLowerCase() === 'open' ? 'selected' : '' %>>Open</option>
+			<option value="read" <%= String(filterValues.readStatus || '').toLowerCase() === 'read' ? 'selected' : '' %>>Read</option>
+		</select>
+
+		<label for="q">Keyword</label>
+		<input id="q" name="q" type="text" value="<%= filterValues.q || '' %>" placeholder="Search sender, email, or message">
+
+		<div>
+			<button type="submit" class="btn btn-primary">Apply</button>
+			<a href="/employee/contact-form-submissions" class="btn">Reset</a>
+		</div>
+	</form>
+</section>
+
+<section class="card glass-panel">
 	<% const messages = Array.isArray(contactForms) ? contactForms : []; %>
 	<% if (messages.length > 0) { %>
 		<table style="width:100%; border-collapse: collapse;">
 			<thead>
 				<tr>
+					<th style="text-align:left; padding: 0.5rem;">Status</th>
 					<th style="text-align:left; padding: 0.5rem;">Sender</th>
 					<th style="text-align:left; padding: 0.5rem;">Email</th>
 					<th style="text-align:left; padding: 0.5rem;">Message</th>
@@ -20,6 +48,7 @@
 			<tbody>
 				<% messages.forEach((item) => { %>
 					<tr>
+						<td style="padding: 0.5rem;"><%= item.isRead ? 'Read' : 'Open' %></td>
 						<td style="padding: 0.5rem;"><%= item.senderName %></td>
 						<td style="padding: 0.5rem;"><%= item.senderEmail %></td>
 						<td style="padding: 0.5rem;"><%= item.message %></td>

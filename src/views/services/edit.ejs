@@ -9,7 +9,7 @@
 	<form action="/services/<%= request && request.requestId ? request.requestId : '' %>/edit" method="POST">
 		<label for="service_status">Status</label>
 		<select id="service_status" name="service_status" required>
-			<option value="Submitted" <%= request && request.serviceStatus === 'Submitted' ? 'selected' : '' %>>Submitted</option>
+			<option value="Open" <%= request && (request.displayStatus === 'Open' || request.serviceStatus === 'Submitted') ? 'selected' : '' %>>Open</option>
 			<option value="In Progress" <%= request && request.serviceStatus === 'In Progress' ? 'selected' : '' %>>In Progress</option>
 			<option value="Completed" <%= request && request.serviceStatus === 'Completed' ? 'selected' : '' %>>Completed</option>
 		</select>

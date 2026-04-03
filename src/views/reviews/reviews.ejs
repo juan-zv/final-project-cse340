@@ -9,6 +9,38 @@
 </section>
 
 <section class="card glass-panel">
+	<% const filterValues = (typeof filters !== 'undefined' && filters) ? filters : {}; %>
+	<% const isModeratorViewEnabled = !!(typeof isModeratorView !== 'undefined' && isModeratorView); %>
+	<form method="GET" action="/reviews" style="display:grid; gap:0.75rem;">
+		<label for="sortBy">Sort By</label>
+		<select id="sortBy" name="sortBy">
+			<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
+			<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
+			<option value="vehicle" <%= filterValues.sortBy === 'vehicle' ? 'selected' : '' %>>Vehicle</option>
+			<% if (isModeratorViewEnabled) { %>
+				<option value="reviewer" <%= filterValues.sortBy === 'reviewer' ? 'selected' : '' %>>Reviewer</option>
+			<% } %>
+		</select>
+
+		<label for="vehicle">Filter Vehicle</label>
+		<input id="vehicle" name="vehicle" type="text" value="<%= filterValues.vehicle || '' %>" placeholder="Camry, F-150, etc.">
+
+		<% if (isModeratorViewEnabled) { %>
+			<label for="reviewer">Filter Reviewer</label>
+			<input id="reviewer" name="reviewer" type="text" value="<%= filterValues.reviewer || '' %>" placeholder="Name or partial name">
+		<% } %>
+
+		<label for="q">Keyword</label>
+		<input id="q" name="q" type="text" value="<%= filterValues.q || '' %>" placeholder="Search review text">
+
+		<div>
+			<button type="submit" class="btn btn-primary">Apply</button>
+			<a href="/reviews" class="btn">Reset</a>
+		</div>
+	</form>
+</section>
+
+<section class="card glass-panel">
 	<% const allReviews = Array.isArray(reviews) ? reviews : []; %>
 	<% if (allReviews.length > 0) { %>
 		<% allReviews.forEach((review) => { %>

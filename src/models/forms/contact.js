@@ -30,6 +30,7 @@ const getAllContactForms = async () => {
             sender_name AS senderName,
             sender_email AS senderEmail,
             message_body AS message,
+            is_read AS isRead,
             created_at AS submitted
         FROM contact_messages
         ORDER BY created_at DESC

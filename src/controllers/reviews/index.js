@@ -1,6 +1,7 @@
 import {
 	addReview,
 	deleteReview,
+	getAllReviews,
 	getReviewById,
 	getReviewsByAccountId,
 	updateReview
@@ -51,8 +52,60 @@ export const buildReviewsList = async (req, res, next) => {
 		if (!accountId) {
 			return res.redirect('/login');
 		}
-		const reviews = await getReviewsByAccountId(accountId);
-		res.render('reviews/reviews', { title: 'Reviews', reviews });
+
+		const role = getSessionRole(req);
+		const isModerator = canModerate(role);
+		const sortBy = String(req.query.sortBy || 'newest').toLowerCase();
+		const vehicle = String(req.query.vehicle || '').trim().toLowerCase();
+		const reviewer = String(req.query.reviewer || '').trim().toLowerCase();
+		const keyword = String(req.query.q || '').trim().toLowerCase();
+
+		let reviews = isModerator
+			? await getAllReviews()
+			: await getReviewsByAccountId(accountId);
+
+		reviews = reviews.filter((item) => {
+			const vehicleName = [item.invYear, item.invMake, item.invModel].filter(Boolean).join(' ').toLowerCase();
+			const reviewerName = [item.accountFirstName, item.accountLastName].filter(Boolean).join(' ').toLowerCase();
+			const text = String(item.reviewText || '').toLowerCase();
+
+			if (vehicle && !vehicleName.includes(vehicle)) {
+				return false;
+			}
+			if (isModerator && reviewer && !reviewerName.includes(reviewer)) {
+				return false;
+			}
+			if (keyword && !text.includes(keyword) && !vehicleName.includes(keyword) && !reviewerName.includes(keyword)) {
+				return false;
+			}
+			return true;
+		});
+
+		const byNewest = (a, b) => new Date(b.reviewDate || b.createdAt || 0) - new Date(a.reviewDate || a.createdAt || 0);
+		const byOldest = (a, b) => new Date(a.reviewDate || a.createdAt || 0) - new Date(b.reviewDate || b.createdAt || 0);
+		const byVehicle = (a, b) => String(a.vehicleName || '').localeCompare(String(b.vehicleName || ''));
+		const byReviewer = (a, b) => String(`${a.accountFirstName || ''} ${a.accountLastName || ''}`).localeCompare(String(`${b.accountFirstName || ''} ${b.accountLastName || ''}`));
+
+		const sortMap = {
+			newest: byNewest,
+			oldest: byOldest,
+			vehicle: byVehicle,
+			reviewer: byReviewer
+		};
+
+		reviews.sort(sortMap[sortBy] || byNewest);
+
+		res.render('reviews/reviews', {
+			title: 'Reviews',
+			reviews,
+			filters: {
+				sortBy,
+				vehicle: String(req.query.vehicle || ''),
+				reviewer: String(req.query.reviewer || ''),
+				q: String(req.query.q || '')
+			},
+			isModeratorView: isModerator
+		});
 	} catch (error) {
 		next(error);
 	}

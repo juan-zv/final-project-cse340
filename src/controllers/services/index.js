@@ -7,19 +7,71 @@ import { validationResult } from 'express-validator';
 const getSessionUserId = (req) => req.session?.user?.id || req.session?.user?.account_id;
 const getSessionRole = (req) => req.session?.user?.roleName || req.session?.user?.account_type || req.session?.user?.role;
 const canManageAll = (role) => role === 'Employee' || role === 'Admin';
+const toDisplayStatus = (status) => (status === 'Submitted' ? 'Open' : status);
+const toDbStatus = (status) => (String(status || '').toLowerCase() === 'open' ? 'Submitted' : status);
 
 export const buildServicesList = async (req, res, next) => {
 	try {
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
+		const isManagerView = canManageAll(role);
+		const sortBy = String(req.query.sortBy || 'newest').toLowerCase();
+		const status = String(req.query.status || '').trim().toLowerCase();
+		const serviceType = String(req.query.serviceType || '').trim().toLowerCase();
+		const keyword = String(req.query.q || '').trim().toLowerCase();
 
 		const serviceRequests = canManageAll(role)
 			? await getAllServiceRequests()
 			: await getServiceRequestsByAccount(accountId);
 
+		const filteredRequests = serviceRequests
+			.map((request) => ({
+				...request,
+				displayStatus: toDisplayStatus(request.serviceStatus)
+			}))
+			.filter((request) => {
+				const normalizedStatus = String(request.displayStatus || '').toLowerCase();
+				const normalizedType = String(request.serviceType || '').toLowerCase();
+				const vehicleName = [request.invYear, request.invMake, request.invModel].filter(Boolean).join(' ').toLowerCase();
+				const notes = String(request.requestNotes || '').toLowerCase();
+				const requester = `${request.accountFirstName || ''} ${request.accountLastName || ''}`.trim().toLowerCase();
+
+				if (status && normalizedStatus !== status) {
+					return false;
+				}
+				if (serviceType && !normalizedType.includes(serviceType)) {
+					return false;
+				}
+				if (keyword && !notes.includes(keyword) && !vehicleName.includes(keyword) && !requester.includes(keyword)) {
+					return false;
+				}
+				return true;
+			});
+
+		const byNewest = (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0);
+		const byOldest = (a, b) => new Date(a.updatedAt || a.createdAt || 0) - new Date(b.updatedAt || b.createdAt || 0);
+		const byStatus = (a, b) => String(a.displayStatus || '').localeCompare(String(b.displayStatus || ''));
+		const byType = (a, b) => String(a.serviceType || '').localeCompare(String(b.serviceType || ''));
+
+		const sortMap = {
+			newest: byNewest,
+			oldest: byOldest,
+			status: byStatus,
+			type: byType
+		};
+
+		filteredRequests.sort(sortMap[sortBy] || byNewest);
+
 		res.render('services/services', {
 			title: 'Services',
-			serviceRequests
+			serviceRequests: filteredRequests,
+			filters: {
+				sortBy,
+				status: String(req.query.status || ''),
+				serviceType: String(req.query.serviceType || ''),
+				q: String(req.query.q || '')
+			},
+			isManagerView
 		});
 	} catch (error) {
 		next(error);
@@ -87,9 +139,14 @@ export const buildServiceRequestEdit = async (req, res, next) => {
 			return res.status(403).send('Forbidden: You do not have permission to access this service request.');
 		}
 
+		const requestWithDisplayStatus = {
+			...request,
+			displayStatus: toDisplayStatus(request.serviceStatus)
+		};
+
 		res.render('services/edit', {
 			title: 'Edit Service Request',
-			request
+			request: requestWithDisplayStatus
 		});
 	} catch (error) {
 		next(error);
@@ -119,7 +176,7 @@ export const updateServiceRequest = async (req, res, next) => {
 
 		await updateServiceRequestStatus(
 			req.params.requestId,
-			req.body.service_status,
+			toDbStatus(req.body.service_status),
 			req.body.request_notes
 		);
 
