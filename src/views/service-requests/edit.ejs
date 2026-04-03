@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Update Service Request</h1>
+	<p>Manage request progress and add notes for the customer.</p>
+</section>
+
+<section class="card glass-panel">
+	<form action="/service-requests/<%= request && (request.request_id || request.id) ? (request.request_id || request.id) : '' %>/edit" method="POST">
+		<label for="service_status">Status</label>
+		<select id="service_status" name="service_status" required>
+			<option value="Submitted" <%= request && request.service_status === 'Submitted' ? 'selected' : '' %>>Submitted</option>
+			<option value="In Progress" <%= request && request.service_status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+			<option value="Completed" <%= request && request.service_status === 'Completed' ? 'selected' : '' %>>Completed</option>
+		</select>
+
+		<label for="request_notes">Service Notes</label>
+		<textarea
+			id="request_notes"
+			name="request_notes"
+			rows="6"
+			maxlength="2000"
+			placeholder="Add notes for diagnostics, updates, or completion details"
+		><%= request && request.request_notes ? request.request_notes : '' %></textarea>
+
+		<button type="submit" class="btn btn-primary">Save Update</button>
+		<a href="/service-requests" class="btn">Back to Requests</a>
+	</form>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,35 @@
+<%- include('../../partials/header') %>
+
+<section class="card glass-panel">
+    <h1>Edit Account</h1>
+    <p>Update account name and email details.</p>
+</section>
+
+<section class="card glass-panel">
+    <form action="/register/<%= user && user.id ? user.id : '' %>/edit" method="POST">
+        <label for="name">Name</label>
+        <input
+            id="name"
+            name="name"
+            type="text"
+            minlength="2"
+            maxlength="100"
+            required
+            value="<%= user && user.name ? user.name : '' %>"
+        >
+
+        <label for="email">Email</label>
+        <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value="<%= user && user.email ? user.email : '' %>"
+        >
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a class="btn" href="/register/list">Back to List</a>
+    </form>
+</section>
+
+<%- include('../../partials/footer') %>

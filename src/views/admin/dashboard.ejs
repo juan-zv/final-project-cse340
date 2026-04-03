@@ -19,7 +19,7 @@
 
     <div class="card">
         <h2>Employee Tools</h2>
-        <a href="/employee/dashboard" class="btn">Access Employee View</a>
+        <a href="/dashboard" class="btn">Access Employee View</a>
         <a href="/admin/employees/manage" class="btn-secondary">Manage Staff Accounts</a>
     </div>
 
@@ -29,5 +29,19 @@
     </div>
 
 </div>
+
+<section class="card glass-panel">
+    <h2>Required Data Model (Project Scope)</h2>
+    <p>The platform is designed around these core tables and relationships:</p>
+    <ul style="padding-left: 1.2rem;">
+        <li>Users table with a role field (User, Employee, Admin).</li>
+        <li>Vehicles table for core listing and pricing data.</li>
+        <li>Categories table linked to vehicles.</li>
+        <li>Reviews table linked to users and vehicles.</li>
+        <li>Service requests table linked to users with status tracking.</li>
+        <li>Contact messages table from the public form.</li>
+        <li>Vehicle images table with one-to-many relationship to vehicles.</li>
+    </ul>
+</section>
 
 <%- include('../partials/footer') %>

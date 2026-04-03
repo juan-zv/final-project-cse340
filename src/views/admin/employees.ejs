@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Employee Account Management</h1>
+	<p>Owner tools for adding, reviewing, and updating employee access.</p>
+</section>
+
+<section class="card glass-panel">
+	<h2>Team Directory</h2>
+	<% const staff = Array.isArray(employees) ? employees : []; %>
+	<% if (staff.length > 0) { %>
+		<table style="width:100%; border-collapse: collapse;">
+			<thead>
+				<tr>
+					<th style="text-align:left; padding: 0.5rem;">Name</th>
+					<th style="text-align:left; padding: 0.5rem;">Email</th>
+					<th style="text-align:left; padding: 0.5rem;">Role</th>
+					<th style="text-align:left; padding: 0.5rem;">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% staff.forEach((employee) => { %>
+					<tr>
+						<td style="padding: 0.5rem;"><%= employee.name || ((employee.account_firstname || '') + ' ' + (employee.account_lastname || '')).trim() %></td>
+						<td style="padding: 0.5rem;"><%= employee.email || employee.account_email || 'N/A' %></td>
+						<td style="padding: 0.5rem;"><%= employee.roleName || employee.account_type || 'Employee' %></td>
+						<td style="padding: 0.5rem;">
+							<a href="/register/<%= employee.id || employee.account_id %>/edit" class="btn">Edit</a>
+						</td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+	<% } else { %>
+		<p>No employee records loaded. You can keep this as a hardcoded list if needed for the project scope.</p>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

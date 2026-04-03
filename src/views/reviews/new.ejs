@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Leave a Vehicle Review</h1>
+	<p>Share your experience to help other customers make informed decisions.</p>
+</section>
+
+<section class="card glass-panel">
+	<form action="/reviews" method="POST">
+		<label for="inv_id">Vehicle</label>
+		<input
+			type="text"
+			id="inv_id"
+			name="inv_id"
+			value="<%= typeof inv_id !== 'undefined' ? inv_id : '' %>"
+			placeholder="Vehicle ID"
+			required
+		>
+
+		<label for="review_text">Your Review</label>
+		<textarea
+			id="review_text"
+			name="review_text"
+			rows="6"
+			minlength="10"
+			maxlength="1200"
+			required
+			placeholder="Write your review here..."
+		></textarea>
+
+		<button type="submit" class="btn btn-primary">Submit Review</button>
+		<a href="/reviews" class="btn">Cancel</a>
+	</form>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,75 @@
+<%- include('../partials/header') %>
+
+<div class="login-container">
+	<section class="login-hero">
+		<h1>Welcome Back</h1>
+		<p>Sign in to manage your account, track requests, and access your dashboard.</p>
+	</section>
+
+	<% const flashMessages = typeof flash === 'function' ? flash() : { success: [], error: [], warning: [], info: [] }; %>
+
+	<% if (flashMessages.success && flashMessages.success.length) { %>
+		<section class="flash-stack">
+			<% flashMessages.success.forEach((msg) => { %>
+				<p class="flash flash-success"><%= msg %></p>
+			<% }) %>
+		</section>
+	<% } %>
+
+	<% if (flashMessages.error && flashMessages.error.length) { %>
+		<section class="flash-stack">
+			<% flashMessages.error.forEach((msg) => { %>
+				<p class="flash flash-error"><%= msg %></p>
+			<% }) %>
+		</section>
+	<% } %>
+
+	<% if (flashMessages.warning && flashMessages.warning.length) { %>
+		<section class="flash-stack">
+			<% flashMessages.warning.forEach((msg) => { %>
+				<p class="flash flash-warning"><%= msg %></p>
+			<% }) %>
+		</section>
+	<% } %>
+
+	<section class="login-layout">
+		<article class="login-panel">
+			<h2>Account Login</h2>
+			<form action="/login" method="POST" class="login-form" novalidate>
+				<label for="email">Email Address</label>
+				<input
+					type="email"
+					id="email"
+					name="email"
+					required
+					autocomplete="email"
+					placeholder="you@example.com"
+				>
+
+				<label for="password">Password</label>
+				<input
+					type="password"
+					id="password"
+					name="password"
+					required
+					autocomplete="current-password"
+					placeholder="Enter your password"
+				>
+
+				<button type="submit" class="btn btn-primary">Sign In</button>
+			</form>
+			<p class="form-note">Don't have an account? <a href="/register">Create one here</a>.</p>
+		</article>
+
+		<aside class="login-panel">
+			<h2>Quick Access</h2>
+			<ul class="benefit-list">
+				<li>View your account dashboard and latest updates.</li>
+				<li>Manage service requests in one place.</li>
+				<li>Save time with a faster checkout and support flow.</li>
+			</ul>
+		</aside>
+	</section>
+</div>
+
+<%- include('../partials/footer') %>

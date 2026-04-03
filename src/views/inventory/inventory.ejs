@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<h1>Vehicle Inventory</h1>
+
+<% if (isLoggedIn) { %>
+	<section class="card" style="margin-bottom: 1rem;">
+		<p>Welcome back<%= user && user.name ? `, ${user.name}` : '' %>. You are signed in.</p>
+		<% if (role === 'Admin') { %>
+			<a href="/dashboard" class="btn btn-primary">Manage Inventory</a>
+		<% } else if (role === 'Employee') { %>
+			<a href="/dashboard" class="btn btn-primary">Employee Inventory Tools</a>
+		<% } else { %>
+			<a href="/dashboard" class="btn btn-primary">Go to My Dashboard</a>
+		<% } %>
+	</section>
+<% } else { %>
+	<section class="card" style="margin-bottom: 1rem;">
+		<p>Sign in to unlock dashboard tools and faster service request workflows.</p>
+		<a href="/login" class="btn">Log In</a>
+	</section>
+<% } %>
+
+<div class="filters">
+	<form action="/catalog" method="GET">
+		<label for="category">Filter by Category:</label>
+		<select name="category" id="category" onchange="this.form.submit()">
+			<option value="">All Vehicles</option>
+			<option value="Trucks">Trucks</option>
+			<option value="Vans">Vans</option>
+			<option value="Cars">Cars</option>
+			<option value="SUVs">SUVs</option>
+		</select>
+	</form>
+</div>
+
+<div class="vehicle-grid">
+	<% if (typeof vehicles !== 'undefined' && vehicles.length > 0) { %>
+		<% vehicles.forEach(v => { %>
+			<div class="vehicle-card">
+				<h2><%= v.year %> <%= v.make %> <%= v.model %></h2>
+				<p class="status">Status: <%= v.status %></p>
+				<p><strong>$<%= v.price %></strong></p>
+				<a href="/catalog/<%= v.id %>" class="btn">View Details</a>
+				<% if (isLoggedIn) { %>
+					<a href="/dashboard" class="btn" style="margin-left: 0.5rem;">Save to Dashboard</a>
+				<% } %>
+			</div>
+		<% }) %>
+	<% } else { %>
+		<p>No vehicles found matching your criteria.</p>
+	<% } %>
+</div>
+
+<%- include('../partials/footer') %>

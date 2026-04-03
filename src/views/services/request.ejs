@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Submit Service Request</h1>
+	<p>Tell us what your vehicle needs, and we will follow up with scheduling details.</p>
+</section>
+
+<section class="card glass-panel">
+	<form action="/services/request" method="POST">
+		<label for="inv_id">Vehicle ID</label>
+		<input
+			type="text"
+			id="inv_id"
+			name="inv_id"
+			value="<%= typeof inv_id !== 'undefined' ? inv_id : '' %>"
+			placeholder="Enter your vehicle ID"
+		>
+
+		<label for="service_type">Service Type</label>
+		<select id="service_type" name="service_type" required>
+			<option value="">Select a service</option>
+			<option value="Oil Change">Oil Change</option>
+			<option value="Inspection">Inspection</option>
+			<option value="Brake Service">Brake Service</option>
+			<option value="Tire Service">Tire Service</option>
+			<option value="General Maintenance">General Maintenance</option>
+		</select>
+
+		<label for="request_notes">Request Notes</label>
+		<textarea
+			id="request_notes"
+			name="request_notes"
+			rows="6"
+			minlength="10"
+			maxlength="2000"
+			required
+			placeholder="Describe symptoms, preferred timing, and any extra details"
+		></textarea>
+
+		<button type="submit" class="btn btn-primary">Send Request</button>
+		<a href="/service-requests" class="btn">View Request History</a>
+	</form>
+</section>
+
+<%- include('../partials/footer') %>

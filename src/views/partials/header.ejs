@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= typeof title !== 'undefined' ? title : 'Card Dealership' %></title>
+    <title><%= typeof title !== 'undefined' ? title : 'Car Dealership' %></title>
     <link rel="stylesheet" href="/css/main.css">
+    <%- typeof renderStyles === 'function' ? renderStyles() : '' %>
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo"><a href="/">Card Dealership</a></div>
+            <div class="logo"><a href="/">Car Dealership</a></div>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
-                <li><a href="/inventory">Browse Vehicles</a></li>
+                <li><a href="/catalog">Browse Vehicles</a></li>
                 <li><a href="/contact">Contact</a></li>
                 
                 <% if (user) { %>
                     <% if (role === 'Admin') { %>
-                        <li><a href="/admin/dashboard">Owner Dashboard</a></li>
+                        <li><a href="/dashboard">Owner Dashboard</a></li>
                     <% } else if (role === 'Employee') { %>
-                        <li><a href="/employee/dashboard">Employee Dashboard</a></li>
+                        <li><a href="/dashboard">Employee Dashboard</a></li>
                     <% } else { %>
-                        <li><a href="/user/dashboard">My Dashboard</a></li>
+                        <li><a href="/dashboard">My Dashboard</a></li>
                     <% } %>
                     <li><a href="/logout">Log Out</a></li>
                 <% } else { %>

@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+
+<div class="contact-container">
+    <section class="contact-hero">
+        <h1>Contact Our Team</h1>
+        <p>Have a question about inventory, financing, or service scheduling? Send us a message and we will get back to you soon.</p>
+    </section>
+
+    <% const flashMessages = typeof flash === 'function' ? flash() : { success: [], error: [], warning: [], info: [] }; %>
+
+    <% if (flashMessages.success && flashMessages.success.length) { %>
+        <section class="flash-stack">
+            <% flashMessages.success.forEach((msg) => { %>
+                <p class="flash flash-success"><%= msg %></p>
+            <% }) %>
+        </section>
+    <% } %>
+
+    <% if (flashMessages.error && flashMessages.error.length) { %>
+        <section class="flash-stack">
+            <% flashMessages.error.forEach((msg) => { %>
+                <p class="flash flash-error"><%= msg %></p>
+            <% }) %>
+        </section>
+    <% } %>
+
+    <section class="contact-layout">
+        <article class="contact-panel">
+            <h2>Send a Message</h2>
+            <form action="/contact" method="POST" class="contact-form" novalidate>
+                <label for="subject">Subject</label>
+                <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    minlength="3"
+                    maxlength="120"
+                    required
+                    placeholder="How can we help you?"
+                >
+
+                <label for="message">Message</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="7"
+                    minlength="10"
+                    maxlength="2000"
+                    required
+                    placeholder="Share details about your request..."
+                ></textarea>
+
+                <button type="submit" class="btn btn-primary">Submit Message</button>
+            </form>
+        </article>
+
+        <aside class="contact-panel">
+            <h2>Why Contact Us?</h2>
+            <ul class="benefit-list">
+                <li>Get inventory and pricing guidance from our team.</li>
+                <li>Request help with service scheduling and maintenance questions.</li>
+                <li>Receive a response from a real person, usually within one business day.</li>
+            </ul>
+        </aside>
+    </section>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,41 @@
+<%- include('../../partials/header') %>
+
+<section class="card glass-panel">
+    <h1>Registered Users</h1>
+    <p>Review and manage registered accounts.</p>
+</section>
+
+<section class="card glass-panel">
+    <% const usersList = Array.isArray(users) ? users : []; %>
+    <% if (usersList.length > 0) { %>
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding: 0.5rem;">Name</th>
+                    <th style="text-align:left; padding: 0.5rem;">Email</th>
+                    <th style="text-align:left; padding: 0.5rem;">Role</th>
+                    <th style="text-align:left; padding: 0.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% usersList.forEach((u) => { %>
+                    <tr>
+                        <td style="padding: 0.5rem;"><%= u.name %></td>
+                        <td style="padding: 0.5rem;"><%= u.email %></td>
+                        <td style="padding: 0.5rem;"><%= u.roleName || 'User' %></td>
+                        <td style="padding: 0.5rem;">
+                            <a class="btn" href="/register/<%= u.id %>/edit">Edit</a>
+                            <form action="/register/<%= u.id %>/delete" method="POST" style="display:inline-block; margin-left: 0.5rem;">
+                                <button type="submit" class="btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No users found.</p>
+    <% } %>
+</section>
+
+<%- include('../../partials/footer') %>

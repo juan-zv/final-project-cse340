@@ -1,89 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="/css/main.css">
-</head>
-<body>
-    <%- include('partials/header') %>
-    <main class="home-container">
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Welcome to Our Dealership</h1>
-                <p>Find your dream car, truck, van, or SUV today. We offer the best prices and top-tier service!</p>
-                <nav class="hero-nav">
-                    <a href="/catalog" class="btn btn-primary">Browse Inventory</a>
-                    <a href="/login" class="btn btn-secondary">Login</a>
-                    <a href="/registration" class="btn btn-outline">Sign Up</a>
-                </nav>
-            </div>
-        </section>
+<%- include('partials/header') %>
 
-        <section class="categories">
-            <h2>Browse by Category</h2>
-            <div class="category-grid">
-                <a href="/catalog/category/cars" class="category-card">
-                    <h3>Cars</h3>
-                </a>
-                <a href="/catalog/category/trucks" class="category-card">
-                    <h3>Trucks</h3>
-                </a>
-                <a href="/catalog/category/suvs" class="category-card">
-                    <h3>SUVs</h3>
-                </a>
-                <a href="/catalog/category/vans" class="category-card">
-                    <h3>Vans</h3>
-                </a>
-            </div>
-        </section>
+<div class="home-container">
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Our Dealership</h1>
+            <p>Find your dream car, truck, van, or SUV today. We offer top-tier service and transparent pricing.</p>
+            <nav class="hero-nav">
+                <a href="/catalog" class="btn btn-primary">Browse Inventory</a>
+                <a href="/login" class="btn btn-secondary">Login</a>
+                <a href="/register" class="btn btn-outline">Sign Up</a>
+            </nav>
+        </div>
+    </section>
 
-        <section class="featured-vehicles">
-            <h2>Featured Vehicles</h2>
-            <div class="vehicle-grid">
-                <% if (locals.featuredVehicles && featuredVehicles.length > 0) { %>
-                    <% featuredVehicles.forEach(vehicle => { %>
-                        <div class="vehicle-card">
-                            <!-- Assuming your vehicle objects have image details, make/model, and price -->
-                            <img src="<%= vehicle.thumbnail || '/images/default-vehicle.jpg' %>" alt="<%= vehicle.make %> <%= vehicle.model %>">
-                            <h3><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></h3>
-                            <p class="price">$<%= vehicle.price %></p>
-                            <a href="/catalog/detail/<%= vehicle.id %>" class="btn btn-small">View Details</a>
-                        </div>
-                    <% }) %>
-                <% } else { %>
-                    <div class="vehicle-card">
-                        <img src="https://picsum.photos/400/250?random=1" alt="Placeholder Car">
-                        <h3>2024 Example Sedan</h3>
-                        <p class="price">$25,000</p>
-                        <a href="/catalog/detail/1" class="btn btn-small">View Details</a>
-                    </div>
-                    <div class="vehicle-card">
-                        <img src="https://picsum.photos/400/250?random=2" alt="Placeholder SUV">
-                        <h3>2023 Example SUV</h3>
-                        <p class="price">$38,500</p>
-                        <a href="/catalog/detail/2" class="btn btn-small">View Details</a>
-                    </div>
-                    <div class="vehicle-card">
-                        <img src="https://picsum.photos/400/250?random=3" alt="Placeholder Truck">
-                        <h3>2022 Example Truck</h3>
-                        <p class="price">$42,000</p>
-                        <a href="/catalog/detail/3" class="btn btn-small">View Details</a>
-                    </div>
-                <% } %>
-            </div>
-        </section>
+    <section class="categories">
+        <h2>Browse by Category</h2>
+        <div class="category-grid">
+            <a href="/catalog" class="category-card"><h3>Cars</h3></a>
+            <a href="/catalog" class="category-card"><h3>Trucks</h3></a>
+            <a href="/catalog" class="category-card"><h3>SUVs</h3></a>
+            <a href="/catalog" class="category-card"><h3>Vans</h3></a>
+        </div>
+    </section>
 
-        <section class="contact-cta">
-            <h2>Need Maintenance or Have Questions?</h2>
-            <p>Our expert technicians are here to help. Reach out to us or schedule a service if you're already a member.</p>
-            <div class="cta-links">
-                <a href="/contact" class="btn btn-secondary">Contact Us</a>
-                <a href="/user/dashboard" class="btn btn-outline">Schedule Service</a>
-            </div>
-        </section>
-    </main>
-    <%- include('partials/footer') %>
-</body>
-</html>
+    <section class="featured-vehicles">
+        <h2>Featured Vehicles</h2>
+        <div class="vehicle-grid">
+            <% if (typeof featuredVehicles !== 'undefined' && featuredVehicles.length > 0) { %>
+                <% featuredVehicles.forEach((vehicle) => { %>
+                    <article class="vehicle-card">
+                        <img src="<%= vehicle.thumbnail || '/images/default-vehicle.jpg' %>" alt="<%= vehicle.make %> <%= vehicle.model %>">
+                        <h3><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></h3>
+                        <p class="price">$<%= vehicle.price %></p>
+                        <a href="/catalog/<%= vehicle.id %>" class="btn btn-small">View Details</a>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <article class="vehicle-card">
+                    <img src="https://picsum.photos/400/250?random=1" alt="Placeholder Car">
+                    <h3>2024 Example Sedan</h3>
+                    <p class="price">$25,000</p>
+                    <a href="/catalog/demo-1" class="btn btn-small">View Details</a>
+                </article>
+                <article class="vehicle-card">
+                    <img src="https://picsum.photos/400/250?random=2" alt="Placeholder SUV">
+                    <h3>2023 Example SUV</h3>
+                    <p class="price">$38,500</p>
+                    <a href="/catalog/demo-2" class="btn btn-small">View Details</a>
+                </article>
+                <article class="vehicle-card">
+                    <img src="https://picsum.photos/400/250?random=3" alt="Placeholder Truck">
+                    <h3>2022 Example Truck</h3>
+                    <p class="price">$42,000</p>
+                    <a href="/catalog/demo-3" class="btn btn-small">View Details</a>
+                </article>
+            <% } %>
+        </div>
+    </section>
+
+    <section class="contact-cta">
+        <h2>Need Maintenance or Have Questions?</h2>
+        <p>Our expert technicians are here to help. Reach out or schedule service from your dashboard.</p>
+        <div class="cta-links">
+            <a href="/contact" class="btn btn-secondary">Contact Us</a>
+            <a href="/dashboard" class="btn btn-outline">Schedule Service</a>
+        </div>
+    </section>
+
+    <section class="categories">
+        <h2>Account Types and Access</h2>
+        <div class="category-grid">
+            <article class="category-card">
+                <h3>Public Visitor</h3>
+                <p>Browse categories, view vehicle details, pricing, and send contact messages.</p>
+            </article>
+            <article class="category-card">
+                <h3>Registered User</h3>
+                <p>Leave reviews, manage your reviews, submit service requests, and track status history.</p>
+            </article>
+            <article class="category-card">
+                <h3>Employee</h3>
+                <p>Update vehicle details, moderate reviews, and manage service progress with notes.</p>
+            </article>
+            <article class="category-card">
+                <h3>Owner / Admin</h3>
+                <p>Full control over categories, vehicles, team accounts, and system-wide activity data.</p>
+            </article>
+        </div>
+    </section>
+</div>
+
+<%- include('partials/footer') %>
