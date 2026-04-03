@@ -23,6 +23,15 @@ const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const sessionSecret = process.env.SESSION_SECRET || 'dev_only_fallback_secret';
+
+if (NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+    console.warn('SESSION_SECRET is not set in production. Using fallback secret is not recommended.');
+}
+
+if (process.env.RENDER === 'true') {
+    app.set('trust proxy', 1);
+}
 
 // Initialize PostgreSQL session store
 const pgSession = connectPgSimple(session);
@@ -32,10 +41,9 @@ app.use(session({
     store: new pgSession({
         pool: pgPool,
         tableName: 'session',
-        createTableIfMissing: true,
-        pruneSessionInterval: false
+        createTableIfMissing: true
     }),
-    secret: process.env.SESSION_SECRET || 'fallback_secret',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {

@@ -1,5 +1,18 @@
 import db from '../db.js';
 
+const splitName = (name = '') => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+        return { firstName: '', lastName: '' };
+    }
+
+    const parts = trimmed.split(/\s+/);
+    const firstName = parts.shift() || '';
+    const lastName = parts.length > 0 ? parts.join(' ') : 'User';
+
+    return { firstName, lastName };
+};
+
 /**
  * Checks if an email address is already registered in the database.
  * 
@@ -8,7 +21,7 @@ import db from '../db.js';
  */
 const emailExists = async (email) => {
     const query = `
-        SELECT EXISTS(SELECT 1 FROM users WHERE email = $1) as exists
+        SELECT EXISTS(SELECT 1 FROM accounts WHERE LOWER(account_email) = LOWER($1)) as exists
     `;
     const result = await db.query(query, [email]);
     return result.rows[0].exists;
@@ -23,12 +36,25 @@ const emailExists = async (email) => {
  * @returns {Promise<Object>} The newly created user record (without password)
  */
 const saveUser = async (name, email, hashedPassword) => {
+    const { firstName, lastName } = splitName(name);
+
     const query = `
-        INSERT INTO users (name, email, password)
-        VALUES ($1, $2, $3)
-        RETURNING id, name, email, created_at
+        INSERT INTO accounts (
+            account_firstname,
+            account_lastname,
+            account_email,
+            account_password,
+            account_type
+        )
+        VALUES ($1, $2, $3, $4, 'User')
+        RETURNING
+            account_id AS id,
+            account_firstname || ' ' || account_lastname AS name,
+            account_email AS email,
+            created_at,
+            account_type::text AS "roleName"
     `;
-    const result = await db.query(query, [name, email, hashedPassword]);
+    const result = await db.query(query, [firstName, lastName, email, hashedPassword]);
     return result.rows[0];
 };
 
@@ -39,8 +65,13 @@ const saveUser = async (name, email, hashedPassword) => {
  */
 const getAllUsers = async () => {
     const query = `
-        SELECT id, name, email, created_at
-        FROM users
+        SELECT
+            account_id AS id,
+            account_firstname || ' ' || account_lastname AS name,
+            account_email AS email,
+            created_at,
+            account_type::text AS "roleName"
+        FROM accounts
         ORDER BY created_at DESC
     `;
     const result = await db.query(query);
@@ -53,14 +84,13 @@ const getAllUsers = async () => {
 const getUserById = async (id) => {
     const query = `
         SELECT 
-            users.id,
-            users.name,
-            users.email,
-            users.created_at,
-            roles.role_name AS "roleName"
-        FROM users
-        INNER JOIN roles ON users.role_id = roles.id
-        WHERE users.id = $1
+            account_id AS id,
+            account_firstname || ' ' || account_lastname AS name,
+            account_email AS email,
+            created_at,
+            account_type::text AS "roleName"
+        FROM accounts
+        WHERE account_id = $1
     `;
     const result = await db.query(query, [id]);
     return result.rows[0] || null;
@@ -70,13 +100,22 @@ const getUserById = async (id) => {
  * Update a user's name and email
  */
 const updateUser = async (id, name, email) => {
+    const { firstName, lastName } = splitName(name);
+
     const query = `
-        UPDATE users 
-        SET name = $1, email = $2, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $3
-        RETURNING id, name, email, updated_at
+        UPDATE accounts
+        SET account_firstname = $1,
+            account_lastname = $2,
+            account_email = $3
+        WHERE account_id = $4
+        RETURNING
+            account_id AS id,
+            account_firstname || ' ' || account_lastname AS name,
+            account_email AS email,
+            created_at,
+            account_type::text AS "roleName"
     `;
-    const result = await db.query(query, [name, email, id]);
+    const result = await db.query(query, [firstName, lastName, email, id]);
     return result.rows[0] || null;
 };
 
@@ -84,7 +123,7 @@ const updateUser = async (id, name, email) => {
  * Delete a user account
  */
 const deleteUser = async (id) => {
-    const query = 'DELETE FROM users WHERE id = $1';
+    const query = 'DELETE FROM accounts WHERE account_id = $1';
     const result = await db.query(query, [id]);
     return result.rowCount > 0;
 };

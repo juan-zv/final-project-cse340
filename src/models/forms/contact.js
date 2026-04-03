@@ -9,7 +9,7 @@ import db from '../db.js';
  */
 const createContactForm = async (subject, message) => {
     const query = `
-        INSERT INTO contact_form (subject, message)
+        INSERT INTO contact_messages (subject, message)
         VALUES ($1, $2)
         RETURNING *
     `;
@@ -24,9 +24,9 @@ const createContactForm = async (subject, message) => {
  */
 const getAllContactForms = async () => {
     const query = `
-        SELECT id, subject, message, submitted
-        FROM contact_form
-        ORDER BY submitted DESC
+        SELECT id, subject, message, created_at AS submitted
+        FROM contact_messages
+        ORDER BY created_at DESC
     `;
     const result = await db.query(query);
     return result.rows;

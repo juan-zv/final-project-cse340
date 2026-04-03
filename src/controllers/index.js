@@ -1,5 +1,9 @@
 // Route handlers for static pages
 const homePage = (req, res) => {
+    if (typeof res.addStyle === 'function') {
+        res.addStyle('<link rel="stylesheet" href="/css/home.css">');
+    }
+
     res.render('home', { title: 'Home' });
 };
 
@@ -13,14 +17,4 @@ const testErrorPage = (req, res, next) => {
     next(err);
 };
 
-export { homePage, aboutPage, demoPage, testErrorPage };
-
-// Export all domain controllers from here to act as a central hub
-export * as adminController from './admin/index.js';
-export * as catalogController from './catalog/index.js';
-export * as employeeController from './employee/index.js';
-export * as inventoryController from './inventory/index.js';
-export * as reviewsController from './reviews/index.js';
-export * as serviceRequestsController from './service-requests/index.js';
-export * as servicesController from './services/index.js';
-export * as userController from './user/index.js';
+export { homePage, aboutPage, testErrorPage };

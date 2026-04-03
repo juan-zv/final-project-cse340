@@ -44,7 +44,7 @@ if (process.env.DB_SSL === 'false') {
  */
 const pool = new Pool({
     connectionString,
-    max: Number(process.env.DB_POOL_MAX || 5),
+    max: Number(process.env.DB_POOL_MAX || 1),
     idleTimeoutMillis: Number(process.env.DB_POOL_IDLE_MS || 10000),
     connectionTimeoutMillis: Number(process.env.DB_POOL_CONNECT_TIMEOUT_MS || 5000),
     ssl

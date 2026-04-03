@@ -80,9 +80,14 @@ const addLocalVariables = (req, res, next) => {
     const randomTheme = themes[Math.floor(Math.random() * themes.length)];
     res.locals.bodyClass = randomTheme;
 
-    // Convenience variable for UI state based on session state
+    // Provide auth context expected by shared templates.
+    res.locals.user = null;
+    res.locals.role = null;
     res.locals.isLoggedIn = false;
+
     if (req.session && req.session.user) {
+        res.locals.user = req.session.user;
+        res.locals.role = req.session.user.roleName || req.session.user.account_type || req.session.user.role || null;
         res.locals.isLoggedIn = true;
     }
 

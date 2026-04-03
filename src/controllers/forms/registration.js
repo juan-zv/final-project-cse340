@@ -10,6 +10,7 @@ import {
     deleteUser
 } from '../../models/forms/registration.js';
 import { requireLogin } from '../../middleware/auth.js';
+import { requireEmployee } from '../../middleware/auth.js';
 import { registrationValidation, editValidation } from '../../middleware/validation/forms.js';
 
 const router = Router();
@@ -18,9 +19,7 @@ const router = Router();
  * Display the registration form page.
  */
 const showRegistrationForm = (req, res) => {
-    // TODO: Render the registration form view (forms/registration/form)
-    // TODO: Pass title: 'User Registration' in the data object
-    res.render('forms/registration/form', { title: 'User Registration' });
+    res.render('forms/registration', { title: 'User Registration' });
 };
 
 /**
@@ -32,6 +31,7 @@ const processRegistration = async (req, res) => {
 
     if (!errors.isEmpty()) {
         console.log('Validation errors:', errors.array());
+        errors.array().forEach((error) => req.flash('error', error.msg));
         return res.redirect('/register');
     }
 
@@ -106,7 +106,8 @@ const showEditAccountForm = async (req, res) => {
     }
 
     // Check permissions: users can edit themselves, admins can edit anyone
-    const canEdit = currentUser.id === targetUserId || currentUser.roleName === 'admin';
+    const currentRole = (currentUser.roleName || '').toLowerCase();
+    const canEdit = currentUser.id === targetUserId || currentRole === 'admin';
 
     if (!canEdit) {
         req.flash('error', 'You do not have permission to edit this account.');
@@ -145,7 +146,8 @@ const processEditAccount = async (req, res) => {
         }
 
         // Check permissions
-        const canEdit = currentUser.id === targetUserId || currentUser.roleName === 'admin';
+        const currentRole = (currentUser.roleName || '').toLowerCase();
+        const canEdit = currentUser.id === targetUserId || currentRole === 'admin';
 
         if (!canEdit) {
             req.flash('error', 'You do not have permission to edit this account.');
@@ -186,7 +188,7 @@ const processDeleteAccount = async (req, res) => {
     const currentUser = req.session.user;
 
     // Only admins can delete accounts
-    if (currentUser.roleName !== 'admin') {
+    if ((currentUser.roleName || '').toLowerCase() !== 'admin') {
         req.flash('error', 'You do not have permission to delete accounts.');
         return res.redirect('/register/list');
     }
@@ -226,7 +228,7 @@ router.post('/', registrationValidation, processRegistration);
 /**
  * GET /register/list - Display all registered users
  */
-router.get('/list', showAllUsers);
+router.get('/list', requireEmployee, showAllUsers);
 
 /**
  * GET /register/:id/edit - Display edit account form

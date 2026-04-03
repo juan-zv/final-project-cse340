@@ -9,9 +9,7 @@ const router = Router();
  * Display the login form.
  */
 const showLoginForm = (req, res) => {
-    // TODO: Render the login form view (forms/login/form)
-    // TODO: Pass title: 'User Login'
-    res.render('forms/login/form', { title: 'User Login' });
+    res.render('forms/login', { title: 'User Login' });
 };
 
 /**
@@ -128,9 +126,21 @@ const showDashboard = (req, res) => {
         delete sessionData.user.password;
     }
 
-    // TODO: Render the dashboard view (dashboard)
-    // TODO: Pass title: 'Dashboard', user, and sessionData to template
-    res.render('dashboard', { title: 'Dashboard', user, sessionData });
+    // Render role-specific dashboard views.
+    if (user?.roleName === 'Admin') {
+        return res.render('admin/dashboard', { title: 'Admin Dashboard', user, sessionData });
+    }
+
+    if (user?.roleName === 'Employee') {
+        return res.render('employee/dashboard', { title: 'Employee Dashboard', user, sessionData });
+    }
+
+    res.render('user/dashboard', {
+        title: 'Dashboard',
+        user,
+        sessionData,
+        serviceRequests: []
+    });
 };
 
 // Routes
