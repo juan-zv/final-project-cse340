@@ -33,3 +33,28 @@
         </nav>
     </header>
     <main>
+        <% const flashMessages = typeof flash === 'function' ? flash() : { success: [], error: [], warning: [], info: [] }; %>
+
+        <% if (flashMessages.success && flashMessages.success.length) { %>
+            <section class="flash-stack">
+                <% flashMessages.success.forEach((msg) => { %>
+                    <p class="flash flash-success"><%= msg %></p>
+                <% }) %>
+            </section>
+        <% } %>
+
+        <% if (flashMessages.error && flashMessages.error.length) { %>
+            <section class="flash-stack">
+                <% flashMessages.error.forEach((msg) => { %>
+                    <p class="flash flash-error"><%= msg %></p>
+                <% }) %>
+            </section>
+        <% } %>
+
+        <% if (flashMessages.warning && flashMessages.warning.length) { %>
+            <section class="flash-stack">
+                <% flashMessages.warning.forEach((msg) => { %>
+                    <p class="flash flash-warning"><%= msg %></p>
+                <% }) %>
+            </section>
+        <% } %>

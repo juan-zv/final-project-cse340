@@ -22,12 +22,12 @@
 			<tbody>
 				<% requests.forEach((request) => { %>
 					<tr>
-						<td style="padding: 0.5rem;"><%= request.service_type || 'General Service' %></td>
-						<td style="padding: 0.5rem;"><%= request.service_status || 'Submitted' %></td>
-						<td style="padding: 0.5rem;"><%= request.request_notes || 'No notes yet' %></td>
-						<td style="padding: 0.5rem;"><%= request.updated_at ? new Date(request.updated_at).toLocaleDateString() : (request.created_at ? new Date(request.created_at).toLocaleDateString() : 'N/A') %></td>
+						<td style="padding: 0.5rem;"><%= request.serviceType || 'General Service' %></td>
+						<td style="padding: 0.5rem;"><%= request.serviceStatus || 'Submitted' %></td>
+						<td style="padding: 0.5rem;"><%= request.requestNotes || 'No notes yet' %></td>
+						<td style="padding: 0.5rem;"><%= request.updatedAt ? new Date(request.updatedAt).toLocaleDateString() : (request.createdAt ? new Date(request.createdAt).toLocaleDateString() : 'N/A') %></td>
 						<td style="padding: 0.5rem;">
-							<a href="/service-requests/<%= request.request_id || request.id %>/edit" class="btn">Open</a>
+							<a href="/service-requests/<%= request.requestId %>/edit" class="btn">Open</a>
 						</td>
 					</tr>
 				<% }) %>

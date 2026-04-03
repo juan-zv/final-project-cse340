@@ -6,14 +6,14 @@ DROP TABLE IF EXISTS service_requests CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS contact_messages CASCADE;
 DROP TABLE IF EXISTS inventory CASCADE;
-DROP TABLE IF EXISTS classifications CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS accounts CASCADE;
 
 -- Drop types if they exist
 DROP TYPE IF EXISTS account_type CASCADE;
 DROP TYPE IF EXISTS service_status CASCADE;
 
--- Create valid account types enum
+-- Create valid enum types
 CREATE TYPE account_type AS ENUM ('User', 'Employee', 'Admin');
 CREATE TYPE service_status AS ENUM ('Submitted', 'In Progress', 'Completed');
 
@@ -28,8 +28,8 @@ CREATE TABLE accounts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create classifications table (categories)
-CREATE TABLE classifications (
+-- Create categories table
+CREATE TABLE categories (
     classification_id SERIAL PRIMARY KEY,
     classification_name VARCHAR(50) UNIQUE NOT NULL
 );
@@ -47,7 +47,7 @@ CREATE TABLE inventory (
     inv_miles INTEGER NOT NULL,
     is_available BOOLEAN DEFAULT true,
     classification_id INTEGER NOT NULL,
-    CONSTRAINT fk_classification FOREIGN KEY (classification_id) REFERENCES classifications(classification_id) ON DELETE CASCADE
+    CONSTRAINT fk_classification FOREIGN KEY (classification_id) REFERENCES categories(classification_id) ON DELETE CASCADE
 );
 
 -- Create reviews table
@@ -68,7 +68,7 @@ CREATE TABLE service_requests (
     service_status service_status DEFAULT 'Submitted',
     request_notes TEXT,
     account_id INTEGER NOT NULL,
-    inv_id INTEGER, -- Optional, if it's a vehicle from inventory they bought
+    inv_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_service_account FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
 );
@@ -83,8 +83,8 @@ CREATE TABLE contact_messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert initial classifications
-INSERT INTO classifications (classification_name) VALUES
+-- Insert initial categories
+INSERT INTO categories (classification_name) VALUES
     ('Trucks'),
     ('Vans'),
     ('Cars'),
@@ -95,6 +95,31 @@ INSERT INTO accounts (account_firstname, account_lastname, account_email, accoun
     ('Admin', 'Account', 'admin@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Admin'),
     ('Employee', 'Account', 'employee@exampl.ecom', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Employee'),
     ('User', 'Account', 'user@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'User');
+
+-- Seed inventory (3 per category)
+INSERT INTO inventory (
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    classification_id
+) VALUES
+    ('Ford', 'F-150', '2018', 'Well-kept full-size pickup with proven durability and towing power.', '/images/ford-f150-2018.png', '/images/ford-f150-2018-thumb.png', 31995, 74500, 1),
+    ('Chevrolet', 'Silverado 1500', '2017', 'Popular used truck with strong V8 capability and roomy cabin.', '/images/chevy-silverado-2017.png', '/images/chevy-silverado-2017-thumb.png', 29995, 81200, 1),
+    ('Ram', '1500', '2019', 'Comfortable work truck with a smooth ride and strong resale value.', '/images/ram-1500-2019.png', '/images/ram-1500-2019-thumb.png', 34995, 63800, 1),
+    ('Honda', 'Odyssey', '2018', 'Reliable family van with sliding doors, space, and easy access.', '/images/honda-odyssey-2018.png', '/images/honda-odyssey-2018-thumb.png', 23995, 69100, 2),
+    ('Toyota', 'Sienna', '2017', 'Dependable minivan with great space for families and road trips.', '/images/toyota-sienna-2017.png', '/images/toyota-sienna-2017-thumb.png', 22995, 74800, 2),
+    ('Dodge', 'Grand Caravan', '2016', 'Budget-friendly used van with flexible seating and cargo room.', '/images/dodge-grand-caravan-2016.png', '/images/dodge-grand-caravan-2016-thumb.png', 16995, 95400, 2),
+    ('Toyota', 'Camry', '2018', 'Well-known sedan with strong reliability and low ownership costs.', '/images/toyota-camry-2018.png', '/images/toyota-camry-2018-thumb.png', 19995, 66300, 3),
+    ('Honda', 'Civic', '2017', 'Compact car with excellent fuel economy and everyday comfort.', '/images/honda-civic-2017.png', '/images/honda-civic-2017-thumb.png', 17995, 72100, 3),
+    ('Nissan', 'Altima', '2019', 'Popular midsize sedan with a comfortable ride and modern features.', '/images/nissan-altima-2019.png', '/images/nissan-altima-2019-thumb.png', 18995, 58900, 3),
+    ('Toyota', 'RAV4', '2018', 'Practical used SUV with strong reliability and high demand.', '/images/toyota-rav4-2018.png', '/images/toyota-rav4-2018-thumb.png', 24995, 70200, 4),
+    ('Honda', 'CR-V', '2017', 'Compact SUV known for comfort, space, and good fuel economy.', '/images/honda-crv-2017.png', '/images/honda-crv-2017-thumb.png', 22995, 76900, 4),
+    ('Ford', 'Escape', '2016', 'Affordable used SUV with good versatility and easy city driving.', '/images/ford-escape-2016.png', '/images/ford-escape-2016-thumb.png', 15995, 88200, 4);
 
 COMMIT;
 

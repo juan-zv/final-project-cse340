@@ -4,12 +4,14 @@ import { getReviewsByVehicleId } from '../../models/reviews/index.js';
 const buildCatalogList = async (req, res, next) => {
     try {
         const category = req.query.category || '';
-        const vehicles = await getInventory(category);
+        const sortBy = req.query.sortBy || 'newest';
+        const vehicles = await getInventory(category, sortBy);
 
         res.render('inventory/inventory', {
             title: 'Vehicle Inventory',
             vehicles,
-            currentCategory: category
+            currentCategory: category,
+            currentSort: sortBy
         });
     } catch (error) {
         next(error);
@@ -21,19 +23,19 @@ const buildCatalogDetail = async (req, res, next) => {
         const slugId = req.params.slugId;
         const vehicle = await getVehicleByRouteId(slugId);
 
-        if (!vehicle) {
+        if (Object.keys(vehicle).length === 0) {
             const err = new Error(`Vehicle ${slugId} not found`);
             err.status = 404;
             return next(err);
         }
 
-        const reviews = await getReviewsByVehicleId(vehicle.inv_id);
+        const reviews = await getReviewsByVehicleId(vehicle.id);
 
         res.render('inventory/detail', {
-            title: `${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}`,
+            title: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
             vehicle,
             reviews,
-            vehicleImages: [{ image_path: vehicle.inv_image }]
+            vehicleImages: [{ imagePath: vehicle.image }]
         });
     } catch (error) {
         next(error);

@@ -19,7 +19,7 @@ const router = Router();
  * Display the registration form page.
  */
 const showRegistrationForm = (req, res) => {
-    res.render('forms/registration', { title: 'User Registration' });
+    res.render('forms/registration/form', { title: 'User Registration' });
 };
 
 /**

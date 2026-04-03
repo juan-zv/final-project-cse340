@@ -53,7 +53,7 @@ export const submitReview = async (req, res, next) => {
 export const buildReviewEdit = async (req, res, next) => {
 	try {
 		const review = await getReviewById(req.params.reviewId);
-		if (!review) {
+		if (Object.keys(review).length === 0) {
 			const err = new Error('Review not found');
 			err.status = 404;
 			return next(err);
@@ -61,7 +61,7 @@ export const buildReviewEdit = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (review.account_id !== accountId && !canModerate(role)) {
+		if (review.accountId !== accountId && !canModerate(role)) {
 			return res.status(403).send('Forbidden: You do not have permission to edit this review.');
 		}
 
@@ -80,7 +80,7 @@ export const updateReviewById = async (req, res, next) => {
 		}
 
 		const review = await getReviewById(req.params.reviewId);
-		if (!review) {
+		if (Object.keys(review).length === 0) {
 			const err = new Error('Review not found');
 			err.status = 404;
 			return next(err);
@@ -88,7 +88,7 @@ export const updateReviewById = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (review.account_id !== accountId && !canModerate(role)) {
+		if (review.accountId !== accountId && !canModerate(role)) {
 			return res.status(403).send('Forbidden: You do not have permission to edit this review.');
 		}
 
@@ -103,7 +103,7 @@ export const updateReviewById = async (req, res, next) => {
 export const deleteReviewById = async (req, res, next) => {
 	try {
 		const review = await getReviewById(req.params.reviewId);
-		if (!review) {
+		if (Object.keys(review).length === 0) {
 			const err = new Error('Review not found');
 			err.status = 404;
 			return next(err);
@@ -111,7 +111,7 @@ export const deleteReviewById = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (review.account_id !== accountId && !canModerate(role)) {
+		if (review.accountId !== accountId && !canModerate(role)) {
 			return res.status(403).send('Forbidden: You do not have permission to delete this review.');
 		}
 

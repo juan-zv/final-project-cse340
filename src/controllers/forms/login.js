@@ -9,7 +9,7 @@ const router = Router();
  * Display the login form.
  */
 const showLoginForm = (req, res) => {
-    res.render('forms/login', { title: 'User Login' });
+    res.render('forms/login/form', { title: 'User Login' });
 };
 
 /**
@@ -126,20 +126,10 @@ const showDashboard = (req, res) => {
         delete sessionData.user.password;
     }
 
-    // Render role-specific dashboard views.
-    if (user?.roleName === 'Admin') {
-        return res.render('admin/dashboard', { title: 'Admin Dashboard', user, sessionData });
-    }
-
-    if (user?.roleName === 'Employee') {
-        return res.render('employee/dashboard', { title: 'Employee Dashboard', user, sessionData });
-    }
-
-    res.render('user/dashboard', {
+    res.render('dashboard', {
         title: 'Dashboard',
         user,
-        sessionData,
-        serviceRequests: []
+        sessionData
     });
 };
 

@@ -29,7 +29,7 @@ import {
     serviceRequestUpdateValidation,
     serviceRequestValidation
 } from './middleware/validation/forms.js';
-import { requireAuth, requireAdmin, requireEmployee } from './middleware/auth.js';
+import { requireLogin, requireAdmin, requireEmployee } from './middleware/auth.js';
 import { Router } from 'express';
 
 // Create a new router instance
@@ -85,30 +85,30 @@ router.use('/contact', contactRoutes);
 
 // Authentication-related routes at root level
 router.get('/logout', processLogout);
-router.get('/dashboard', requireAuth, showDashboard);
+router.get('/dashboard', requireLogin, showDashboard);
 router.get('/admin/dashboard', requireAdmin, buildAdminDashboard);
 router.get('/admin/employees', requireAdmin, buildEmployeesList);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
-router.get('/user/dashboard', requireAuth, (req, res) => res.redirect('/dashboard'));
+router.get('/user/dashboard', requireLogin, (req, res) => res.redirect('/dashboard'));
 
 // Reviews
-router.get('/reviews', requireAuth, buildReviewsList);
-router.get('/reviews/new', requireAuth, buildReviewNew);
-router.post('/reviews', requireAuth, reviewValidation, submitReview);
-router.get('/reviews/:reviewId/edit', requireAuth, buildReviewEdit);
-router.post('/reviews/:reviewId/edit', requireAuth, reviewValidation, updateReviewById);
-router.post('/reviews/:reviewId/delete', requireAuth, deleteReviewById);
+router.get('/reviews', requireLogin, buildReviewsList);
+router.get('/reviews/new', requireLogin, buildReviewNew);
+router.post('/reviews', requireLogin, reviewValidation, submitReview);
+router.get('/reviews/:reviewId/edit', requireLogin, buildReviewEdit);
+router.post('/reviews/:reviewId/edit', requireLogin, reviewValidation, updateReviewById);
+router.post('/reviews/:reviewId/delete', requireLogin, deleteReviewById);
 
 // Services
 router.get('/services', buildServicesList);
-router.get('/services/request', requireAuth, buildServiceRequest);
-router.post('/services/request', requireAuth, serviceRequestValidation, submitServiceRequest);
+router.get('/services/request', requireLogin, buildServiceRequest);
+router.post('/services/request', requireLogin, serviceRequestValidation, submitServiceRequest);
 
 // Service request history and updates
-router.get('/service-requests', requireAuth, buildServiceRequestsList);
-router.get('/service-requests/:requestId/edit', requireAuth, buildServiceRequestEdit);
-router.post('/service-requests/:requestId/edit', requireAuth, serviceRequestUpdateValidation, updateServiceRequest);
+router.get('/service-requests', requireLogin, buildServiceRequestsList);
+router.get('/service-requests/:requestId/edit', requireLogin, buildServiceRequestEdit);
+router.post('/service-requests/:requestId/edit', requireLogin, serviceRequestUpdateValidation, updateServiceRequest);
 
 // Export the router to be used in the main app
 export default router;

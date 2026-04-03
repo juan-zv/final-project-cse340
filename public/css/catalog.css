@@ -1,0 +1,15 @@
+/* Catalog section specific tweaks */
+.filters {
+    margin: 1rem 0;
+}
+
+.filters form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.vehicle-grid {
+    margin-top: 1rem;
+}

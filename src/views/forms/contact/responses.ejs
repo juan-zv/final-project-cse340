@@ -1,0 +1,34 @@
+<%- include('../../partials/header') %>
+
+<section class="card glass-panel">
+    <h1>Contact Form Submissions</h1>
+    <p>Review incoming messages and follow up quickly.</p>
+</section>
+
+<section class="card glass-panel">
+    <% const messages = Array.isArray(contactForms) ? contactForms : []; %>
+    <% if (messages.length > 0) { %>
+        <table style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left; padding: 0.5rem;">Subject</th>
+                    <th style="text-align:left; padding: 0.5rem;">Message</th>
+                    <th style="text-align:left; padding: 0.5rem;">Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% messages.forEach((item) => { %>
+                    <tr>
+                        <td style="padding: 0.5rem;"><%= item.subject %></td>
+                        <td style="padding: 0.5rem;"><%= item.message %></td>
+                        <td style="padding: 0.5rem;"><%= item.submitted ? new Date(item.submitted).toLocaleString() : 'N/A' %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No contact submissions yet.</p>
+    <% } %>
+</section>
+
+<%- include('../../partials/footer') %>

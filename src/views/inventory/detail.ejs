@@ -5,15 +5,15 @@
 
 <section class="card glass-panel">
 	<h1>
-		<%= v.inv_year || v.year || 'Vehicle' %>
-		<%= v.inv_make || v.make || '' %>
-		<%= v.inv_model || v.model || '' %>
+		<%= v.year || 'Vehicle' %>
+		<%= v.make || '' %>
+		<%= v.model || '' %>
 	</h1>
 	<p>
 		Category:
-		<strong><%= v.classification_name || v.category || 'Uncategorized' %></strong>
+		<strong><%= v.category || 'Uncategorized' %></strong>
 		| Availability:
-		<strong><%= v.status || v.availability || 'Available' %></strong>
+		<strong><%= v.status || 'Available' %></strong>
 	</p>
 </section>
 
@@ -23,12 +23,12 @@
 		<% if (images.length > 0) { %>
 			<% images.forEach((img) => { %>
 				<article class="vehicle-card">
-					<img src="<%= img.image_path || img.url || '/images/default-vehicle.jpg' %>" alt="Vehicle image">
+					<img src="<%= img.imagePath || img.url || '/images/default-vehicle.jpg' %>" alt="Vehicle image">
 				</article>
 			<% }) %>
 		<% } else { %>
 			<article class="vehicle-card">
-				<img src="<%= v.inv_image || v.thumbnail || '/images/default-vehicle.jpg' %>" alt="Vehicle image">
+				<img src="<%= v.image || v.thumbnail || '/images/default-vehicle.jpg' %>" alt="Vehicle image">
 			</article>
 		<% } %>
 	</div>
@@ -36,18 +36,18 @@
 
 <section class="card glass-panel">
 	<h2>Specifications and Pricing</h2>
-	<p><strong>Price:</strong> $<%= v.inv_price || v.price || 'N/A' %></p>
-	<p><strong>Mileage:</strong> <%= v.inv_miles || v.mileage || 'N/A' %></p>
-	<p><strong>Color:</strong> <%= v.inv_color || v.color || 'N/A' %></p>
-	<p><strong>Description:</strong> <%= v.inv_description || v.description || 'No description available.' %></p>
+	<p><strong>Price:</strong> $<%= v.price || 'N/A' %></p>
+	<p><strong>Mileage:</strong> <%= v.miles || 'N/A' %></p>
+	<p><strong>Color:</strong> <%= v.color || 'N/A' %></p>
+	<p><strong>Description:</strong> <%= v.description || 'No description available.' %></p>
 </section>
 
 <section class="card glass-panel">
 	<h2>Owner Features</h2>
 	<% if (isLoggedIn) { %>
 		<p>Signed in users can leave reviews and submit service requests for their vehicles.</p>
-		<a class="btn btn-primary" href="/reviews/new?inv_id=<%= v.inv_id || v.id || '' %>">Leave a Review</a>
-		<a class="btn" href="/services/request?inv_id=<%= v.inv_id || v.id || '' %>">Request Service</a>
+		<a class="btn btn-primary" href="/reviews/new?inv_id=<%= v.id || '' %>">Leave a Review</a>
+		<a class="btn" href="/services/request?inv_id=<%= v.id || '' %>">Request Service</a>
 	<% } else { %>
 		<p>Log in to leave a review, request service, and track your request history.</p>
 		<a class="btn btn-primary" href="/login">Log In to Continue</a>

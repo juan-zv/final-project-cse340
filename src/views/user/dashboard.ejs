@@ -38,9 +38,9 @@
 			<tbody>
 				<% myRequests.forEach((request) => { %>
 					<tr>
-						<td style="padding: 0.5rem;"><%= request.service_type || 'General Service' %></td>
-						<td style="padding: 0.5rem;"><%= request.service_status || 'Submitted' %></td>
-						<td style="padding: 0.5rem;"><%= request.created_at ? new Date(request.created_at).toLocaleDateString() : 'N/A' %></td>
+						<td style="padding: 0.5rem;"><%= request.serviceType || 'General Service' %></td>
+						<td style="padding: 0.5rem;"><%= request.serviceStatus || 'Submitted' %></td>
+						<td style="padding: 0.5rem;"><%= request.createdAt ? new Date(request.createdAt).toLocaleDateString() : 'N/A' %></td>
 					</tr>
 				<% }) %>
 			</tbody>

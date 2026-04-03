@@ -1,5 +1,22 @@
 import db from '../db.js';
 
+const mapServiceRequest = (row) => ({
+    requestId: row.request_id,
+    serviceType: row.service_type,
+    serviceStatus: row.service_status,
+    requestNotes: row.request_notes,
+    accountId: row.account_id,
+    invId: row.inv_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    accountFirstName: row.account_firstname,
+    accountLastName: row.account_lastname,
+    accountEmail: row.account_email,
+    invMake: row.inv_make,
+    invModel: row.inv_model,
+    invYear: row.inv_year
+});
+
 const getAllServiceRequests = async () => {
     const query = `
         SELECT
@@ -12,7 +29,7 @@ const getAllServiceRequests = async () => {
     `;
 
     const result = await db.query(query);
-    return result.rows;
+    return result.rows.map(mapServiceRequest);
 };
 
 const getServiceRequestsByAccount = async (accountId) => {
@@ -26,7 +43,7 @@ const getServiceRequestsByAccount = async (accountId) => {
     `;
 
     const result = await db.query(query, [accountId]);
-    return result.rows;
+    return result.rows.map(mapServiceRequest);
 };
 
 const getServiceRequestById = async (requestId) => {
@@ -41,7 +58,7 @@ const getServiceRequestById = async (requestId) => {
     `;
 
     const result = await db.query(query, [requestId]);
-    return result.rows[0] || null;
+    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
 };
 
 const createServiceRequest = async (serviceType, requestNotes, accountId, invId = null) => {
@@ -52,7 +69,7 @@ const createServiceRequest = async (serviceType, requestNotes, accountId, invId 
     `;
 
     const result = await db.query(query, [serviceType, requestNotes, accountId, invId]);
-    return result.rows[0] || null;
+    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
 };
 
 const updateServiceRequestStatus = async (requestId, status, notes = null) => {
@@ -65,7 +82,7 @@ const updateServiceRequestStatus = async (requestId, status, notes = null) => {
     `;
 
     const result = await db.query(query, [status, notes, requestId]);
-    return result.rows[0] || null;
+    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
 };
 
 const deleteServiceRequest = async (requestId) => {
@@ -76,7 +93,7 @@ const deleteServiceRequest = async (requestId) => {
     `;
 
     const result = await db.query(query, [requestId]);
-    return result.rows[0] || null;
+    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
 };
 
 export {

@@ -9,7 +9,7 @@ const router = Router();
  * Display the contact form page.
  */
 const showContactForm = (req, res) => {
-    res.render('forms/contact', {
+    res.render('forms/contact/form', {
         title: 'Contact Us'
     });
 };

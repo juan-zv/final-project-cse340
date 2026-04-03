@@ -6,12 +6,12 @@
 </section>
 
 <section class="card glass-panel">
-	<form action="/service-requests/<%= request && (request.request_id || request.id) ? (request.request_id || request.id) : '' %>/edit" method="POST">
+	<form action="/service-requests/<%= request && request.requestId ? request.requestId : '' %>/edit" method="POST">
 		<label for="service_status">Status</label>
 		<select id="service_status" name="service_status" required>
-			<option value="Submitted" <%= request && request.service_status === 'Submitted' ? 'selected' : '' %>>Submitted</option>
-			<option value="In Progress" <%= request && request.service_status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-			<option value="Completed" <%= request && request.service_status === 'Completed' ? 'selected' : '' %>>Completed</option>
+			<option value="Submitted" <%= request && request.serviceStatus === 'Submitted' ? 'selected' : '' %>>Submitted</option>
+			<option value="In Progress" <%= request && request.serviceStatus === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+			<option value="Completed" <%= request && request.serviceStatus === 'Completed' ? 'selected' : '' %>>Completed</option>
 		</select>
 
 		<label for="request_notes">Service Notes</label>
@@ -21,7 +21,7 @@
 			rows="6"
 			maxlength="2000"
 			placeholder="Add notes for diagnostics, updates, or completion details"
-		><%= request && request.request_notes ? request.request_notes : '' %></textarea>
+		><%= request && request.requestNotes ? request.requestNotes : '' %></textarea>
 
 		<button type="submit" class="btn btn-primary">Save Update</button>
 		<a href="/service-requests" class="btn">Back to Requests</a>

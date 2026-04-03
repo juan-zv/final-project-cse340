@@ -31,7 +31,7 @@ export const buildServiceRequestsList = async (req, res, next) => {
 export const buildServiceRequestEdit = async (req, res, next) => {
 	try {
 		const request = await getServiceRequestById(req.params.requestId);
-		if (!request) {
+		if (Object.keys(request).length === 0) {
 			const err = new Error('Service request not found');
 			err.status = 404;
 			return next(err);
@@ -39,7 +39,7 @@ export const buildServiceRequestEdit = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (request.account_id !== accountId && !canManageAll(role)) {
+		if (request.accountId !== accountId && !canManageAll(role)) {
 			return res.status(403).send('Forbidden: You do not have permission to access this service request.');
 		}
 
@@ -61,7 +61,7 @@ export const updateServiceRequest = async (req, res, next) => {
 		}
 
 		const request = await getServiceRequestById(req.params.requestId);
-		if (!request) {
+		if (Object.keys(request).length === 0) {
 			const err = new Error('Service request not found');
 			err.status = 404;
 			return next(err);
@@ -69,7 +69,7 @@ export const updateServiceRequest = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (request.account_id !== accountId && !canManageAll(role)) {
+		if (request.accountId !== accountId && !canManageAll(role)) {
 			return res.status(403).send('Forbidden: You do not have permission to update this service request.');
 		}
 

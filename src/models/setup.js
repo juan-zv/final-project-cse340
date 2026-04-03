@@ -51,19 +51,84 @@ const syncDefaultAccounts = async () => {
 };
 
 /**
+ * Seeds sample inventory rows when the inventory table exists but is empty.
+ */
+const syncSampleInventory = async () => {
+    const inventoryTableCheck = await db.query(
+        "SELECT to_regclass('public.inventory') IS NOT NULL AS table_exists"
+    );
+
+    if (!inventoryTableCheck.rows[0]?.table_exists) {
+        return;
+    }
+
+    const inventoryDataCheck = await db.query(
+        'SELECT EXISTS (SELECT 1 FROM inventory LIMIT 1) AS has_data'
+    );
+
+    if (inventoryDataCheck.rows[0]?.has_data) {
+        return;
+    }
+
+    const query = `
+        WITH seeded_inventory (inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, classification_name) AS (
+            VALUES
+                ('Ford', 'F-150', '2018', 'Well-kept full-size pickup with proven durability and towing power.', '/images/ford-f150-2018.png', '/images/ford-f150-2018-thumb.png', 31995, 74500, 'Trucks'),
+                ('Chevrolet', 'Silverado 1500', '2017', 'Popular used truck with strong V8 capability and roomy cabin.', '/images/chevy-silverado-2017.png', '/images/chevy-silverado-2017-thumb.png', 29995, 81200, 'Trucks'),
+                ('Ram', '1500', '2019', 'Comfortable work truck with a smooth ride and strong resale value.', '/images/ram-1500-2019.png', '/images/ram-1500-2019-thumb.png', 34995, 63800, 'Trucks'),
+                ('Honda', 'Odyssey', '2018', 'Reliable family van with sliding doors, space, and easy access.', '/images/honda-odyssey-2018.png', '/images/honda-odyssey-2018-thumb.png', 23995, 69100, 'Vans'),
+                ('Toyota', 'Sienna', '2017', 'Dependable minivan with great space for families and road trips.', '/images/toyota-sienna-2017.png', '/images/toyota-sienna-2017-thumb.png', 22995, 74800, 'Vans'),
+                ('Dodge', 'Grand Caravan', '2016', 'Budget-friendly used van with flexible seating and cargo room.', '/images/dodge-grand-caravan-2016.png', '/images/dodge-grand-caravan-2016-thumb.png', 16995, 95400, 'Vans'),
+                ('Toyota', 'Camry', '2018', 'Well-known sedan with strong reliability and low ownership costs.', '/images/toyota-camry-2018.png', '/images/toyota-camry-2018-thumb.png', 19995, 66300, 'Cars'),
+                ('Honda', 'Civic', '2017', 'Compact car with excellent fuel economy and everyday comfort.', '/images/honda-civic-2017.png', '/images/honda-civic-2017-thumb.png', 17995, 72100, 'Cars'),
+                ('Nissan', 'Altima', '2019', 'Popular midsize sedan with a comfortable ride and modern features.', '/images/nissan-altima-2019.png', '/images/nissan-altima-2019-thumb.png', 18995, 58900, 'Cars'),
+                ('Toyota', 'RAV4', '2018', 'Practical used SUV with strong reliability and high demand.', '/images/toyota-rav4-2018.png', '/images/toyota-rav4-2018-thumb.png', 24995, 70200, 'SUVs'),
+                ('Honda', 'CR-V', '2017', 'Compact SUV known for comfort, space, and good fuel economy.', '/images/honda-crv-2017.png', '/images/honda-crv-2017-thumb.png', 22995, 76900, 'SUVs'),
+                ('Ford', 'Escape', '2016', 'Affordable used SUV with good versatility and easy city driving.', '/images/ford-escape-2016.png', '/images/ford-escape-2016-thumb.png', 15995, 88200, 'SUVs')
+        )
+        INSERT INTO inventory (
+            inv_make,
+            inv_model,
+            inv_year,
+            inv_description,
+            inv_image,
+            inv_thumbnail,
+            inv_price,
+            inv_miles,
+            classification_id
+        )
+        SELECT
+            s.inv_make,
+            s.inv_model,
+            s.inv_year,
+            s.inv_description,
+            s.inv_image,
+            s.inv_thumbnail,
+            s.inv_price,
+            s.inv_miles,
+            c.classification_id
+        FROM seeded_inventory s
+        JOIN classifications c ON c.classification_name = s.classification_name
+    `;
+
+    await db.query(query);
+    console.log('Sample inventory synced');
+};
+
+/**
  * Sets up the database by running the seed.sql file if needed.
  * Checks if inventory/classification data exists before reseeding.
  */
 const setupDatabase = async () => {
     // First check if the expected table exists to avoid relation-not-found errors.
     const tableCheck = await db.query(
-        "SELECT to_regclass('public.classifications') IS NOT NULL AS table_exists"
+        "SELECT to_regclass('public.categories') IS NOT NULL AS table_exists"
     );
 
     let hasData = false;
     if (tableCheck.rows[0]?.table_exists) {
         const result = await db.query(
-            'SELECT EXISTS (SELECT 1 FROM classifications LIMIT 1) AS has_data'
+            'SELECT EXISTS (SELECT 1 FROM categories LIMIT 1) AS has_data'
         );
         hasData = result.rows[0]?.has_data || false;
     }
@@ -71,6 +136,7 @@ const setupDatabase = async () => {
     if (hasData) {
         console.log('Database already seeded');
         await syncDefaultAccounts();
+        await syncSampleInventory();
         return true;
     }
     
@@ -90,6 +156,7 @@ const setupDatabase = async () => {
     
     console.log('Database seeded successfully');
     await syncDefaultAccounts();
+    await syncSampleInventory();
     
     return true;
 };

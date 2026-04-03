@@ -1,0 +1,50 @@
+<%- include('partials/header') %>
+
+<section class="card glass-panel">
+    <h1>Dashboard</h1>
+    <p>
+        Welcome
+        <strong><%= user && user.name ? user.name : 'User' %></strong>.
+        You are signed in as <strong><%= user && user.roleName ? user.roleName : 'User' %></strong>.
+    </p>
+</section>
+
+<section class="card glass-panel">
+    <h2>Quick Actions</h2>
+    <div class="vehicle-grid">
+        <article class="vehicle-card">
+            <h3>Browse Inventory</h3>
+            <a href="/catalog" class="btn btn-primary">Open Catalog</a>
+        </article>
+        <article class="vehicle-card">
+            <h3>My Reviews</h3>
+            <a href="/reviews" class="btn">View Reviews</a>
+        </article>
+        <article class="vehicle-card">
+            <h3>Service Requests</h3>
+            <a href="/service-requests" class="btn">Track Requests</a>
+        </article>
+        <article class="vehicle-card">
+            <h3>Contact Team</h3>
+            <a href="/contact" class="btn">Send Message</a>
+        </article>
+    </div>
+</section>
+
+<% if (user && user.roleName === 'Admin') { %>
+<section class="card glass-panel">
+    <h2>Admin Tools</h2>
+    <a href="/admin/dashboard" class="btn btn-primary">Admin Dashboard</a>
+    <a href="/admin/employees" class="btn">Manage Employees</a>
+</section>
+<% } %>
+
+<% if (user && user.roleName === 'Employee') { %>
+<section class="card glass-panel">
+    <h2>Employee Tools</h2>
+    <a href="/employee/dashboard" class="btn btn-primary">Employee Dashboard</a>
+    <a href="/employee/contact-form-submissions" class="btn">Contact Responses</a>
+</section>
+<% } %>
+
+<%- include('partials/footer') %>
