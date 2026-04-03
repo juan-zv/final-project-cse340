@@ -47,6 +47,12 @@
 	<% if (typeof vehicles !== 'undefined' && vehicles.length > 0) { %>
 		<% vehicles.forEach(v => { %>
 			<div class="vehicle-card">
+				<img
+					src="<%= v.image %>"
+					alt="<%= `${v.year} ${v.make} ${v.model}` %>"
+					class="catalog-primary-thumb"
+					loading="lazy"
+				>
 				<h2><%= v.year %> <%= v.make %> <%= v.model %></h2>
 				<p class="status">Status: <%= v.status %></p>
 				<p><strong>$<%= v.price %></strong></p>

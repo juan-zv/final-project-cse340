@@ -1,10 +1,22 @@
+import { getInventory } from '../models/inventory/index.js';
+
 // Route handlers for static pages
-const homePage = (req, res) => {
+const homePage = async (req, res, next) => {
     if (typeof res.addStyle === 'function') {
         res.addStyle('<link rel="stylesheet" href="/css/home.css">');
     }
 
-    res.render('home', { title: 'Home' });
+    try {
+        const inventory = await getInventory('', 'newest');
+        const featuredVehicles = inventory.slice(0, 3);
+
+        res.render('home', {
+            title: 'Home',
+            featuredVehicles
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 const aboutPage = (req, res) => {

@@ -30,7 +30,8 @@ import {
     createVehicleAction,
     updateVehicleAction,
     deleteVehicleAction,
-    buildSystemActivity
+    buildSystemActivity,
+    deleteContactMessageAction
 } from './controllers/admin/index.js';
 import { buildEmployeeDashboard, buildContactSubmissions } from './controllers/employee/index.js';
 import { buildUserDashboard } from './controllers/user/index.js';
@@ -109,6 +110,8 @@ router.post('/admin/inventory', requireAdmin, createVehicleAction);
 router.post('/admin/inventory/:invId/edit', requireAdmin, updateVehicleAction);
 router.post('/admin/inventory/:invId/delete', requireAdmin, deleteVehicleAction);
 router.get('/admin/system', requireAdmin, buildSystemActivity);
+router.post('/admin/system/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
+router.post('/admin/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
 router.get('/user/dashboard', requireLogin, buildUserDashboard);

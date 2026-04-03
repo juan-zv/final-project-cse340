@@ -13,3 +13,26 @@
 .vehicle-grid {
     margin-top: 1rem;
 }
+
+.catalog-primary-thumb {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.vehicle-gallery-image {
+    width: 100%;
+    max-width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+}
+
+.vehicle-gallery-primary {
+    height: min(420px, 60vw);
+}

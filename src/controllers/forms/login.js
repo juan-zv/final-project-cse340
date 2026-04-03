@@ -129,7 +129,11 @@ const showDashboard = (req, res) => {
     res.render('dashboard', {
         title: 'Dashboard',
         user,
-        sessionData
+        sessionData,
+        dashboardTitle: 'Dashboard',
+        dashboardIntro: `Welcome ${user && user.name ? user.name : 'User'}. You are signed in as ${user && user.roleName ? user.roleName : 'User'}.`,
+        dashboardSectionTitle: 'Role Tools',
+        dashboardCards: []
     });
 };
 

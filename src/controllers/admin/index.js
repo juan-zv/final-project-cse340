@@ -2,6 +2,7 @@ import {
 	createCategory,
 	createVehicle,
 	deleteCategory,
+	deleteContactMessage,
 	deleteVehicle,
 	getAllAccounts,
 	getAllCategories,
@@ -16,7 +17,7 @@ export const buildAdminDashboard = async (req, res, next) => {
 	try {
 		res.render('dashboard', {
 			title: 'Admin Dashboard',
-			dashboardTitle: 'Owner / Admin Dashboard',
+			dashboardTitle: 'Admin Dashboard',
 			dashboardIntro: 'Complete system control overview.',
 			dashboardSectionTitle: 'Admin Tools',
 			dashboardCards: [
@@ -284,6 +285,26 @@ export const buildSystemActivity = async (req, res, next) => {
 			activity
 		});
 	} catch (error) {
+		next(error);
+	}
+};
+
+export const deleteContactMessageAction = async (req, res, next) => {
+	try {
+		const messageId = Number.parseInt(req.params.messageId, 10);
+		const returnTo = typeof req.body?.returnTo === 'string' && req.body.returnTo.startsWith('/')
+			? req.body.returnTo
+			: '/admin/system';
+		if (!Number.isInteger(messageId) || messageId < 1) {
+			req.flash('error', 'Invalid contact message delete request.');
+			return res.redirect(returnTo);
+		}
+
+		await deleteContactMessage(messageId);
+		req.flash('success', 'Contact message deleted successfully.');
+		res.redirect(returnTo);
+	} catch (error) {
+		req.flash('error', 'Unable to delete contact message.');
 		next(error);
 	}
 };

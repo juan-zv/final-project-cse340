@@ -168,6 +168,17 @@ const deleteVehicle = async (invId) => {
     return result.rows[0] || null;
 };
 
+const deleteContactMessage = async (messageId) => {
+    const query = `
+        DELETE FROM contact_messages
+        WHERE message_id = $1
+        RETURNING message_id
+    `;
+
+    const result = await db.query(query, [messageId]);
+    return result.rows[0] || null;
+};
+
 const getSystemActivity = async () => {
     const countsQuery = `
         SELECT
@@ -299,5 +310,6 @@ export {
     createVehicle,
     updateVehicle,
     deleteVehicle,
+    deleteContactMessage,
     getSystemActivity
 };

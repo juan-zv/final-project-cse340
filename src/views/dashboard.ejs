@@ -2,10 +2,11 @@
 
 <section class="card glass-panel">
     <h1><%= typeof dashboardTitle !== 'undefined' ? dashboardTitle : 'Dashboard' %></h1>
+    <% const currentUser = typeof user !== 'undefined' ? user : null; %>
     <p>
         <%= typeof dashboardIntro !== 'undefined' && dashboardIntro
             ? dashboardIntro
-            : `Welcome ${user && user.name ? user.name : 'User'}. You are signed in as ${user && user.roleName ? user.roleName : 'User'}.` %>
+            : `Welcome ${currentUser && currentUser.name ? currentUser.name : 'User'}. You are signed in as ${currentUser && currentUser.roleName ? currentUser.roleName : 'User'}.` %>
     </p>
 </section>
 
@@ -31,7 +32,7 @@
     </div>
 </section>
 
-<% const roleCards = Array.isArray(dashboardCards) ? dashboardCards : []; %>
+<% const roleCards = typeof dashboardCards !== 'undefined' && Array.isArray(dashboardCards) ? dashboardCards : []; %>
 <% if (roleCards.length > 0) { %>
 <section class="card glass-panel">
     <h2><%= typeof dashboardSectionTitle !== 'undefined' ? dashboardSectionTitle : 'Role Tools' %></h2>

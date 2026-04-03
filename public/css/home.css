@@ -27,6 +27,22 @@
     color: rgba(243, 244, 246, 0.9);
 }
 
+.hero-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+}
+
+.metric-pill {
+    font-size: 0.85rem;
+    letter-spacing: 0.2px;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(17, 25, 40, 0.5);
+}
+
 .hero-nav,
 .cta-links {
     margin-top: 1rem;
@@ -38,6 +54,23 @@
 .btn-outline {
     border-color: rgba(255, 255, 255, 0.35);
     background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .category-grid {
@@ -92,6 +125,12 @@
     font-weight: 700;
 }
 
+.vehicle-card .vehicle-meta {
+    margin: 0 0.9rem 0.8rem;
+    font-size: 0.88rem;
+    color: rgba(243, 244, 246, 0.72);
+}
+
 .btn-small {
     padding: 0.5rem 0.9rem;
     font-size: 0.9rem;
@@ -108,5 +147,10 @@
     .featured-vehicles,
     .contact-cta {
         padding: 1rem;
+    }
+
+    .section-header {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }

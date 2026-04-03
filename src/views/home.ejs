@@ -3,12 +3,21 @@
 <div class="home-container">
     <section class="hero">
         <div class="hero-content">
-            <h1>Welcome to Our Dealership</h1>
-            <p>Find your dream car, truck, van, or SUV today. We offer top-tier service and transparent pricing.</p>
+            <h1>Find Your Next Vehicle With Confidence</h1>
+            <p>Browse quality inventory, leave verified reviews, and manage service requests from one place.</p>
+            <div class="hero-metrics">
+                <span class="metric-pill">Transparent Pricing</span>
+                <span class="metric-pill">Role-Based Dashboards</span>
+                <span class="metric-pill">Service Tracking</span>
+            </div>
             <nav class="hero-nav">
                 <a href="/catalog" class="btn btn-primary">Browse Inventory</a>
-                <a href="/login" class="btn btn-secondary">Login</a>
-                <a href="/register" class="btn btn-outline">Sign Up</a>
+                <% if (isLoggedIn) { %>
+                    <a href="/dashboard" class="btn btn-secondary">Open Dashboard</a>
+                <% } else { %>
+                    <a href="/login" class="btn btn-secondary">Log In</a>
+                    <a href="/register" class="btn btn-outline">Create Account</a>
+                <% } %>
             </nav>
         </div>
     </section>
@@ -16,43 +25,35 @@
     <section class="categories">
         <h2>Browse by Category</h2>
         <div class="category-grid">
-            <a href="/catalog" class="category-card"><h3>Cars</h3></a>
-            <a href="/catalog" class="category-card"><h3>Trucks</h3></a>
-            <a href="/catalog" class="category-card"><h3>SUVs</h3></a>
-            <a href="/catalog" class="category-card"><h3>Vans</h3></a>
+            <a href="/catalog?category=Cars" class="category-card"><h3>Cars</h3></a>
+            <a href="/catalog?category=Trucks" class="category-card"><h3>Trucks</h3></a>
+            <a href="/catalog?category=SUVs" class="category-card"><h3>SUVs</h3></a>
+            <a href="/catalog?category=Vans" class="category-card"><h3>Vans</h3></a>
         </div>
     </section>
 
     <section class="featured-vehicles">
-        <h2>Featured Vehicles</h2>
+        <div class="section-header">
+            <h2>Featured Vehicles</h2>
+            <a href="/catalog" class="btn btn-small">View All</a>
+        </div>
         <div class="vehicle-grid">
             <% if (typeof featuredVehicles !== 'undefined' && featuredVehicles.length > 0) { %>
                 <% featuredVehicles.forEach((vehicle) => { %>
                     <article class="vehicle-card">
-                        <img src="<%= vehicle.thumbnail || '/images/default-vehicle.jpg' %>" alt="<%= vehicle.make %> <%= vehicle.model %>">
+                        <img src="<%= vehicle.thumbnail || vehicle.image || '/images/default-vehicle.jpg' %>" alt="<%= vehicle.make %> <%= vehicle.model %>">
                         <h3><%= vehicle.year %> <%= vehicle.make %> <%= vehicle.model %></h3>
                         <p class="price">$<%= vehicle.price %></p>
-                        <a href="/catalog/<%= vehicle.id %>" class="btn btn-small">View Details</a>
+                        <p class="vehicle-meta"><%= vehicle.category || 'Vehicle' %> • <%= vehicle.status || 'Available' %></p>
+                        <a href="/catalog/<%= vehicle.slug || vehicle.id %>" class="btn btn-small">View Details</a>
                     </article>
                 <% }) %>
             <% } else { %>
                 <article class="vehicle-card">
-                    <img src="https://picsum.photos/400/250?random=1" alt="Placeholder Car">
-                    <h3>2024 Example Sedan</h3>
-                    <p class="price">$25,000</p>
-                    <a href="/catalog/demo-1" class="btn btn-small">View Details</a>
-                </article>
-                <article class="vehicle-card">
-                    <img src="https://picsum.photos/400/250?random=2" alt="Placeholder SUV">
-                    <h3>2023 Example SUV</h3>
-                    <p class="price">$38,500</p>
-                    <a href="/catalog/demo-2" class="btn btn-small">View Details</a>
-                </article>
-                <article class="vehicle-card">
-                    <img src="https://picsum.photos/400/250?random=3" alt="Placeholder Truck">
-                    <h3>2022 Example Truck</h3>
-                    <p class="price">$42,000</p>
-                    <a href="/catalog/demo-3" class="btn btn-small">View Details</a>
+                    <img src="/images/default-vehicle.jpg" alt="Vehicle placeholder">
+                    <h3>Inventory updates are in progress</h3>
+                    <p class="price">Check back shortly</p>
+                    <a href="/catalog" class="btn btn-small">Open Catalog</a>
                 </article>
             <% } %>
         </div>
@@ -60,10 +61,10 @@
 
     <section class="contact-cta">
         <h2>Need Maintenance or Have Questions?</h2>
-        <p>Our expert technicians are here to help. Reach out or schedule service from your dashboard.</p>
+        <p>Contact our team directly or open a service request to track updates from start to finish.</p>
         <div class="cta-links">
             <a href="/contact" class="btn btn-secondary">Contact Us</a>
-            <a href="/dashboard" class="btn btn-outline">Schedule Service</a>
+            <a href="<%= isLoggedIn ? '/services/request' : '/login' %>" class="btn btn-outline"><%= isLoggedIn ? 'Request Service' : 'Log In to Request Service' %></a>
         </div>
     </section>
 
@@ -83,7 +84,7 @@
                 <p>Update vehicle details, moderate reviews, and manage service progress with notes.</p>
             </article>
             <article class="category-card">
-                <h3>Owner / Admin</h3>
+                <h3>Admin</h3>
                 <p>Full control over categories, vehicles, team accounts, and system-wide activity data.</p>
             </article>
         </div>

@@ -23,13 +23,13 @@
 	<% const secondaryImages = images.length > 1 ? images.slice(1) : []; %>
 	<div style="display:grid; gap: 1rem;">
 		<article class="vehicle-card">
-			<img src="<%= primaryImage && primaryImage.imagePath ? primaryImage.imagePath : (v.image || v.thumbnail || '/images/default-vehicle.jpg') %>" alt="<%= primaryImage && primaryImage.imageLabel ? primaryImage.imageLabel : 'Vehicle image' %>">
+			<img class="vehicle-gallery-image vehicle-gallery-primary" src="<%= primaryImage && primaryImage.imagePath ? primaryImage.imagePath : (v.image || v.thumbnail || '/images/default-vehicle.jpg') %>" alt="<%= primaryImage && primaryImage.imageLabel ? primaryImage.imageLabel : 'Vehicle image' %>">
 		</article>
 		<% if (secondaryImages.length > 0) { %>
 			<div class="vehicle-grid">
 				<% secondaryImages.forEach((img) => { %>
 					<article class="vehicle-card">
-						<img src="<%= img.imagePath || img.url || '/images/default-vehicle.jpg' %>" alt="<%= img.imageLabel || 'Vehicle image' %>">
+						<img class="vehicle-gallery-image" src="<%= img.imagePath || img.url || '/images/default-vehicle.jpg' %>" alt="<%= img.imageLabel || 'Vehicle image' %>">
 					</article>
 				<% }) %>
 			</div>
@@ -46,7 +46,7 @@
 </section>
 
 <section class="card glass-panel">
-	<h2>Owner Features</h2>
+	<h2>Admin Features</h2>
 	<% if (isLoggedIn) { %>
 		<p>Signed in users can leave reviews and submit service requests for their vehicles.</p>
 		<a class="btn btn-primary" href="/reviews/new?inv_id=<%= v.id || '' %>">Leave a Review</a>

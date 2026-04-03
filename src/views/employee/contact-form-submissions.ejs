@@ -34,6 +34,8 @@
 
 <section class="card glass-panel">
 	<% const messages = Array.isArray(contactForms) ? contactForms : []; %>
+	<% const currentRole = user && (user.roleName || user.account_type || user.role); %>
+	<% const isAdminUser = currentRole === 'Admin'; %>
 	<% if (messages.length > 0) { %>
 		<table style="width:100%; border-collapse: collapse;">
 			<thead>
@@ -43,6 +45,9 @@
 					<th style="text-align:left; padding: 0.5rem;">Email</th>
 					<th style="text-align:left; padding: 0.5rem;">Message</th>
 					<th style="text-align:left; padding: 0.5rem;">Submitted</th>
+					<% if (isAdminUser) { %>
+						<th style="text-align:left; padding: 0.5rem;">Actions</th>
+					<% } %>
 				</tr>
 			</thead>
 			<tbody>
@@ -53,6 +58,14 @@
 						<td style="padding: 0.5rem;"><%= item.senderEmail %></td>
 						<td style="padding: 0.5rem;"><%= item.message %></td>
 						<td style="padding: 0.5rem;"><%= item.submitted ? new Date(item.submitted).toLocaleString() : 'N/A' %></td>
+						<% if (isAdminUser) { %>
+							<td style="padding: 0.5rem;">
+								<form action="/admin/contact-messages/<%= item.id %>/delete" method="POST" style="display:inline-block;">
+									<input type="hidden" name="returnTo" value="/employee/contact-form-submissions">
+									<button type="submit" class="btn">Delete</button>
+								</form>
+							</td>
+						<% } %>
 					</tr>
 				<% }) %>
 			</tbody>
