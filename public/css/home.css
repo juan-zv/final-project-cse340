@@ -1,0 +1,112 @@
+.home-container {
+    width: min(1120px, 92vw);
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+    display: grid;
+    gap: 1.75rem;
+}
+
+.hero,
+.categories,
+.featured-vehicles,
+.contact-cta {
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-content h1 {
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    margin-bottom: 0.6rem;
+}
+
+.hero-content p {
+    max-width: 65ch;
+    color: rgba(243, 244, 246, 0.9);
+}
+
+.hero-nav,
+.cta-links {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.btn-outline {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.category-grid {
+    display: grid;
+    gap: 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.category-card {
+    display: grid;
+    place-content: center;
+    min-height: 90px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 12px;
+    background: rgba(17, 25, 40, 0.35);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(29, 180, 137, 0.7);
+}
+
+.vehicle-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.vehicle-card {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(17, 25, 40, 0.45);
+}
+
+.vehicle-card img {
+    display: block;
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.vehicle-card h3,
+.vehicle-card .price,
+.vehicle-card .btn {
+    margin: 0.8rem 0.9rem;
+}
+
+.vehicle-card .price {
+    color: #8ff0d1;
+    font-weight: 700;
+}
+
+.btn-small {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+    .home-container {
+        width: min(1120px, 94vw);
+        padding-top: 1rem;
+    }
+
+    .hero,
+    .categories,
+    .featured-vehicles,
+    .contact-cta {
+        padding: 1rem;
+    }
+}

@@ -1,0 +1,94 @@
+.register-container {
+    width: min(1120px, 92vw);
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+    display: grid;
+    gap: 1.25rem;
+}
+
+.register-hero,
+.register-panel,
+.flash {
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+}
+
+.register-hero,
+.register-panel {
+    padding: 1.25rem;
+}
+
+.register-hero p {
+    max-width: 70ch;
+    color: rgba(243, 244, 246, 0.9);
+}
+
+.register-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1rem;
+}
+
+.register-form {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.register-form label {
+    font-weight: 600;
+    color: rgba(243, 244, 246, 0.95);
+}
+
+.register-form .btn {
+    margin-top: 0.5rem;
+    width: fit-content;
+}
+
+.form-note {
+    margin-top: 0.9rem;
+    color: rgba(243, 244, 246, 0.92);
+}
+
+.benefit-list {
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.flash-stack {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.flash {
+    margin: 0;
+    padding: 0.75rem 0.95rem;
+}
+
+.flash-success {
+    border-color: rgba(59, 225, 166, 0.45);
+    color: #bff5df;
+}
+
+.flash-error {
+    border-color: rgba(255, 122, 122, 0.55);
+    color: #ffd0d0;
+}
+
+.flash-warning {
+    border-color: rgba(255, 209, 102, 0.55);
+    color: #ffecc0;
+}
+
+@media (max-width: 860px) {
+    .register-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .register-container {
+        width: min(1120px, 94vw);
+        padding-top: 1rem;
+    }
+}

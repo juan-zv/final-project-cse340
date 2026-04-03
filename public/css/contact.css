@@ -1,0 +1,96 @@
+.contact-container {
+    width: min(1120px, 92vw);
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+    display: grid;
+    gap: 1.25rem;
+}
+
+.contact-hero,
+.contact-panel,
+.flash {
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+}
+
+.contact-hero {
+    padding: 1.5rem;
+}
+
+.contact-hero p {
+    max-width: 70ch;
+    color: rgba(243, 244, 246, 0.9);
+}
+
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1rem;
+}
+
+.contact-panel {
+    padding: 1.25rem;
+}
+
+.contact-form {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.contact-form label {
+    font-weight: 600;
+    color: rgba(243, 244, 246, 0.95);
+}
+
+.contact-form .btn {
+    margin-top: 0.4rem;
+    width: fit-content;
+}
+
+.benefit-list {
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.note {
+    margin-top: 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 10px;
+    background: rgba(17, 25, 40, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(243, 244, 246, 0.92);
+}
+
+.flash-stack {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.flash {
+    margin: 0;
+    padding: 0.75rem 0.95rem;
+}
+
+.flash-success {
+    border-color: rgba(59, 225, 166, 0.45);
+    color: #bff5df;
+}
+
+.flash-error {
+    border-color: rgba(255, 122, 122, 0.55);
+    color: #ffd0d0;
+}
+
+@media (max-width: 860px) {
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-container {
+        width: min(1120px, 94vw);
+        padding-top: 1rem;
+    }
+}
