@@ -5,6 +5,7 @@ BEGIN;
 DROP TABLE IF EXISTS service_requests CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS contact_messages CASCADE;
+DROP TABLE IF EXISTS vehicle_images CASCADE;
 DROP TABLE IF EXISTS inventory CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS accounts CASCADE;
@@ -48,6 +49,19 @@ CREATE TABLE inventory (
     is_available BOOLEAN DEFAULT true,
     category_id INTEGER NOT NULL,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+);
+
+-- Create vehicle images table (one vehicle to many images)
+CREATE TABLE vehicle_images (
+    image_id SERIAL PRIMARY KEY,
+    inv_id INTEGER NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    image_label VARCHAR(120),
+    sort_order INTEGER DEFAULT 1,
+    is_primary BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_vehicle_images_inventory
+        FOREIGN KEY (inv_id) REFERENCES inventory(inv_id) ON DELETE CASCADE
 );
 
 -- Create reviews table
@@ -120,6 +134,39 @@ INSERT INTO inventory (
     ('Toyota', 'RAV4', '2018', 'Practical used SUV with strong reliability and high demand.', '/images/toyota-rav4.jpg', '/images/toyota-rav4.jpg', 24995, 70200, 4),
     ('Honda', 'CR-V', '2017', 'Compact SUV known for comfort, space, and good fuel economy.', '/images/honda-cr-v.jpg', '/images/honda-cr-v.jpg', 22995, 76900, 4),
     ('Ford', 'Escape', '2016', 'Affordable used SUV with good versatility and easy city driving.', '/images/ford-escape.jpg', '/images/ford-escape.jpg', 15995, 88200, 4);
+
+-- Seed vehicle images (one-to-many relationship)
+INSERT INTO vehicle_images (
+    inv_id,
+    image_path,
+    image_label,
+    sort_order,
+    is_primary
+) VALUES
+    (1, '/images/ford-f-150.jpg', 'Primary image', 1, true),
+    (1, '/images/ford-f-150.jpg', 'Secondary image', 2, false),
+    (2, '/images/chevrolet-silverado-1500.jpg', 'Primary image', 1, true),
+    (2, '/images/chevrolet-silverado-1500.jpg', 'Secondary image', 2, false),
+    (3, '/images/ram-1500.jpg', 'Primary image', 1, true),
+    (3, '/images/ram-1500.jpg', 'Secondary image', 2, false),
+    (4, '/images/honda-odyssey.jpg', 'Primary image', 1, true),
+    (4, '/images/honda-odyssey.jpg', 'Secondary image', 2, false),
+    (5, '/images/toyota-sienna.jpg', 'Primary image', 1, true),
+    (5, '/images/toyota-sienna.jpg', 'Secondary image', 2, false),
+    (6, '/images/dodge-grand-caravan.webp', 'Primary image', 1, true),
+    (6, '/images/dodge-grand-caravan.webp', 'Secondary image', 2, false),
+    (7, '/images/toyota-camry.jpg', 'Primary image', 1, true),
+    (7, '/images/toyota-camry.jpg', 'Secondary image', 2, false),
+    (8, '/images/honda-civic.webp', 'Primary image', 1, true),
+    (8, '/images/honda-civic.webp', 'Secondary image', 2, false),
+    (9, '/images/nissan-altima.webp', 'Primary image', 1, true),
+    (9, '/images/nissan-altima.webp', 'Secondary image', 2, false),
+    (10, '/images/toyota-rav4.jpg', 'Primary image', 1, true),
+    (10, '/images/toyota-rav4.jpg', 'Secondary image', 2, false),
+    (11, '/images/honda-cr-v.jpg', 'Primary image', 1, true),
+    (11, '/images/honda-cr-v.jpg', 'Secondary image', 2, false),
+    (12, '/images/ford-escape.jpg', 'Primary image', 1, true),
+    (12, '/images/ford-escape.jpg', 'Secondary image', 2, false);
 
 COMMIT;
 

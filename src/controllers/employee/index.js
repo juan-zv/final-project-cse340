@@ -2,7 +2,40 @@ import { getAllContactForms } from '../../models/forms/contact.js';
 
 export const buildEmployeeDashboard = async (req, res, next) => {
 	try {
-		res.render('employee/dashboard', { title: 'Employee Dashboard' });
+		res.render('dashboard', {
+			title: 'Employee Dashboard',
+			dashboardTitle: 'Employee Dashboard',
+			dashboardIntro: 'Manage inventory, moderate content, and update service operations in one place.',
+			dashboardSectionTitle: 'Employee Tools',
+			dashboardCards: [
+				{
+					title: 'Vehicle Editing',
+					description: 'Update pricing, descriptions, and availability for listed vehicles.',
+					primaryLink: '/catalog',
+					primaryLabel: 'Open Vehicle Inventory',
+					secondaryLink: '/dashboard',
+					secondaryLabel: 'Back to Shared Dashboard'
+				},
+				{
+					title: 'Review Moderation',
+					description: 'Flag or remove inappropriate reviews and keep vehicle pages professional.',
+					primaryLink: '/reviews',
+					primaryLabel: 'Moderate Reviews'
+				},
+				{
+					title: 'Service Request Queue',
+					description: 'Move requests through Open, In Progress, and Completed states with notes.',
+					primaryLink: '/services',
+					primaryLabel: 'Manage Service Requests'
+				},
+				{
+					title: 'Contact Submissions',
+					description: 'Review incoming public messages and follow up quickly.',
+					primaryLink: '/employee/contact-form-submissions',
+					primaryLabel: 'View Contact Messages'
+				}
+			]
+		});
 	} catch (error) {
 		next(error);
 	}

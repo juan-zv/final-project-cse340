@@ -1,4 +1,4 @@
-import { buildCatalogList, buildCatalogDetail } from './controllers/inventory/index.js';
+import { buildCatalogList, buildCatalogDetail, buildAddVehicleImage, addVehicleImageAction } from './controllers/inventory/index.js';
 import { homePage } from './controllers/index.js';
 import registrationRoutes from './controllers/forms/registration.js';
 import loginRoutes from './controllers/forms/login.js';
@@ -33,6 +33,7 @@ import {
     buildSystemActivity
 } from './controllers/admin/index.js';
 import { buildEmployeeDashboard, buildContactSubmissions } from './controllers/employee/index.js';
+import { buildUserDashboard } from './controllers/user/index.js';
 import {
     reviewValidation,
     serviceRequestUpdateValidation,
@@ -82,6 +83,8 @@ router.get('/', homePage);
 // Course catalog routes
 router.get('/catalog', buildCatalogList);
 router.get('/catalog/:slugId', buildCatalogDetail);
+router.get('/catalog/:slugId/images/new', requireEmployee, buildAddVehicleImage);
+router.post('/catalog/:slugId/images', requireEmployee, addVehicleImageAction);
 
 // Registration routes
 router.use('/register', registrationRoutes);
@@ -108,7 +111,7 @@ router.post('/admin/inventory/:invId/delete', requireAdmin, deleteVehicleAction)
 router.get('/admin/system', requireAdmin, buildSystemActivity);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
-router.get('/user/dashboard', requireLogin, (req, res) => res.redirect('/dashboard'));
+router.get('/user/dashboard', requireLogin, buildUserDashboard);
 
 // Reviews
 router.get('/reviews', requireLogin, buildReviewsList);

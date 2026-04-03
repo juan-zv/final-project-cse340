@@ -10,10 +10,51 @@ import {
 	updateCategory,
 	updateVehicle
 } from '../../models/admin/index.js';
+import { getAllVehicleImages, syncVehicleImages } from '../../models/inventory/index.js';
 
 export const buildAdminDashboard = async (req, res, next) => {
 	try {
-		res.render('admin/dashboard', { title: 'Admin Dashboard' });
+		res.render('dashboard', {
+			title: 'Admin Dashboard',
+			dashboardTitle: 'Owner / Admin Dashboard',
+			dashboardIntro: 'Complete system control overview.',
+			dashboardSectionTitle: 'Admin Tools',
+			dashboardCards: [
+				{
+					title: 'Inventory Management',
+					description: 'Add, edit, and delete inventory vehicles.',
+					primaryLink: '/admin/inventory',
+					primaryLabel: 'Manage Inventory',
+					secondaryLink: '/catalog',
+					secondaryLabel: 'Browse Inventory'
+				},
+				{
+					title: 'Category Management',
+					description: 'Add, edit, and delete categories.',
+					primaryLink: '/admin/categories',
+					primaryLabel: 'Manage Categories',
+					secondaryLink: '/dashboard',
+					secondaryLabel: 'Back to Shared Dashboard'
+				},
+				{
+					title: 'Employee Accounts',
+					description: 'Review and manage staff accounts.',
+					primaryLink: '/admin/employees',
+					primaryLabel: 'Manage Staff Accounts',
+					secondaryLink: '/employee/dashboard',
+					secondaryLabel: 'Access Employee View'
+				},
+				{
+					title: 'System Activity',
+					description: 'View system-wide services, reviews, contacts, and data summaries.',
+					primaryLink: '/admin/system',
+					primaryLabel: 'All System Data',
+					secondaryLink: '/services',
+					secondaryLabel: 'Service Activity'
+				}
+			],
+			showDataModelNotes: true
+		});
 	} catch (error) {
 		next(error);
 	}
@@ -110,6 +151,11 @@ const mapVehiclePayload = (body) => ({
 	categoryId: Number.parseInt(body.category_id || '0', 10)
 });
 
+const parseImagePaths = (value) => String(value || '')
+	.split(/\r?\n|,/)
+	.map((pathValue) => pathValue.trim())
+	.filter(Boolean);
+
 const validateVehiclePayload = (vehicle) => {
 	if (!vehicle.invMake || !vehicle.invModel || !vehicle.invYear || !vehicle.invDescription) {
 		return 'Make, model, year, and description are required.';
@@ -135,11 +181,20 @@ export const buildInventoryManagement = async (req, res, next) => {
 			getAllVehiclesForAdmin(),
 			getAllCategories()
 		]);
+		const vehicleImages = await getAllVehicleImages();
+		const vehicleImagesById = vehicleImages.reduce((groups, image) => {
+			if (!groups[image.invId]) {
+				groups[image.invId] = [];
+			}
+			groups[image.invId].push(image);
+			return groups;
+		}, {});
 
 		res.render('admin/inventory', {
 			title: 'Manage Inventory',
 			vehicles,
-			categories
+			categories,
+			vehicleImagesById
 		});
 	} catch (error) {
 		next(error);
@@ -154,8 +209,17 @@ export const createVehicleAction = async (req, res, next) => {
 			req.flash('error', validationMessage);
 			return res.redirect('/admin/inventory');
 		}
+		const imagePaths = parseImagePaths(req.body.vehicle_images);
+		const resolvedImagePaths = imagePaths.length > 0 ? imagePaths : [req.body.inv_image, req.body.inv_thumbnail];
 
-		await createVehicle(vehicle);
+		const createdVehicle = await createVehicle({
+			...vehicle,
+			invImage: resolvedImagePaths[0] || vehicle.invImage,
+			invThumbnail: resolvedImagePaths[1] || vehicle.invThumbnail
+		});
+		if (createdVehicle?.inv_id) {
+			await syncVehicleImages(createdVehicle.inv_id, resolvedImagePaths);
+		}
 		req.flash('success', 'Vehicle created successfully.');
 		res.redirect('/admin/inventory');
 	} catch (error) {
@@ -178,8 +242,15 @@ export const updateVehicleAction = async (req, res, next) => {
 			req.flash('error', validationMessage);
 			return res.redirect('/admin/inventory');
 		}
+		const imagePaths = parseImagePaths(req.body.vehicle_images);
+		const resolvedImagePaths = imagePaths.length > 0 ? imagePaths : [req.body.inv_image, req.body.inv_thumbnail];
 
-		await updateVehicle(invId, vehicle);
+		await updateVehicle(invId, {
+			...vehicle,
+			invImage: resolvedImagePaths[0] || vehicle.invImage,
+			invThumbnail: resolvedImagePaths[1] || vehicle.invThumbnail
+		});
+		await syncVehicleImages(invId, resolvedImagePaths);
 		req.flash('success', 'Vehicle updated successfully.');
 		res.redirect('/admin/inventory');
 	} catch (error) {

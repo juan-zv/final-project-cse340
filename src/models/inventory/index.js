@@ -180,4 +180,164 @@ const getVehicleById = async (invId) => {
     };
 };
 
-export { getInventory, getVehicleByRouteId, getVehicleById };
+const normalizeImagePaths = (imagePaths = []) => {
+    const seen = new Set();
+    const normalized = [];
+
+    imagePaths.forEach((pathValue) => {
+        const value = String(pathValue || '').trim();
+        if (!value || seen.has(value)) {
+            return;
+        }
+
+        seen.add(value);
+        normalized.push(value);
+    });
+
+    return normalized;
+};
+
+const getVehicleImages = async (invId) => {
+    const numericId = Number(invId);
+    if (!Number.isInteger(numericId) || numericId < 1) {
+        return [];
+    }
+
+    const query = `
+        SELECT
+            image_id,
+            inv_id,
+            image_path,
+            image_label,
+            sort_order,
+            is_primary
+        FROM vehicle_images
+        WHERE inv_id = $1
+        ORDER BY is_primary DESC, sort_order ASC, image_id ASC
+    `;
+
+    const result = await db.query(query, [numericId]);
+    return result.rows.map((row) => ({
+        imageId: row.image_id,
+        invId: row.inv_id,
+        imagePath: row.image_path,
+        imageLabel: row.image_label,
+        sortOrder: row.sort_order,
+        isPrimary: row.is_primary
+    }));
+};
+
+const getAllVehicleImages = async () => {
+    const query = `
+        SELECT
+            image_id,
+            inv_id,
+            image_path,
+            image_label,
+            sort_order,
+            is_primary
+        FROM vehicle_images
+        ORDER BY inv_id ASC, is_primary DESC, sort_order ASC, image_id ASC
+    `;
+
+    const result = await db.query(query);
+    return result.rows.map((row) => ({
+        imageId: row.image_id,
+        invId: row.inv_id,
+        imagePath: row.image_path,
+        imageLabel: row.image_label,
+        sortOrder: row.sort_order,
+        isPrimary: row.is_primary
+    }));
+};
+
+const syncVehicleImages = async (invId, imagePaths = []) => {
+    const numericId = Number(invId);
+    if (!Number.isInteger(numericId) || numericId < 1) {
+        return [];
+    }
+
+    const normalizedPaths = normalizeImagePaths(imagePaths);
+    await db.query('DELETE FROM vehicle_images WHERE inv_id = $1', [numericId]);
+
+    if (normalizedPaths.length === 0) {
+        return [];
+    }
+
+    const inserted = [];
+    for (let index = 0; index < normalizedPaths.length; index += 1) {
+        const imagePath = normalizedPaths[index];
+        const query = `
+            INSERT INTO vehicle_images (inv_id, image_path, image_label, sort_order, is_primary)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING image_id, inv_id, image_path, image_label, sort_order, is_primary
+        `;
+        const result = await db.query(query, [
+            numericId,
+            imagePath,
+            `Vehicle image ${index + 1}`,
+            index + 1,
+            index === 0
+        ]);
+        if (result.rows[0]) {
+            inserted.push({
+                imageId: result.rows[0].image_id,
+                invId: result.rows[0].inv_id,
+                imagePath: result.rows[0].image_path,
+                imageLabel: result.rows[0].image_label,
+                sortOrder: result.rows[0].sort_order,
+                isPrimary: result.rows[0].is_primary
+            });
+        }
+    }
+
+    return inserted;
+};
+
+const addVehicleImage = async (invId, imagePath, imageLabel = 'Vehicle image') => {
+    const numericId = Number(invId);
+    const normalizedPath = String(imagePath || '').trim();
+    if (!Number.isInteger(numericId) || numericId < 1 || !normalizedPath) {
+        return null;
+    }
+
+    const orderQuery = `
+        SELECT
+            COALESCE(MAX(sort_order), 0) AS max_sort_order,
+            COUNT(*) AS image_count
+        FROM vehicle_images
+        WHERE inv_id = $1
+    `;
+    const orderResult = await db.query(orderQuery, [numericId]);
+    const maxSortOrder = Number(orderResult.rows[0]?.max_sort_order || 0);
+    const imageCount = Number(orderResult.rows[0]?.image_count || 0);
+
+    const insertQuery = `
+        INSERT INTO vehicle_images (inv_id, image_path, image_label, sort_order, is_primary)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING image_id, inv_id, image_path, image_label, sort_order, is_primary
+    `;
+
+    const result = await db.query(insertQuery, [
+        numericId,
+        normalizedPath,
+        String(imageLabel || 'Vehicle image').trim() || 'Vehicle image',
+        maxSortOrder + 1,
+        imageCount === 0
+    ]);
+
+    if (!result.rows[0]) {
+        return null;
+    }
+
+    return {
+        imageId: result.rows[0].image_id,
+        invId: result.rows[0].inv_id,
+        imagePath: result.rows[0].image_path,
+        imageLabel: result.rows[0].image_label,
+        sortOrder: result.rows[0].sort_order,
+        isPrimary: result.rows[0].is_primary
+    };
+};
+
+export { getInventory, getVehicleByRouteId, getVehicleById, getVehicleImages, getAllVehicleImages, syncVehicleImages, addVehicleImage };

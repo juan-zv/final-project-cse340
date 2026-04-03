@@ -1,11 +1,11 @@
 <%- include('partials/header') %>
 
 <section class="card glass-panel">
-    <h1>Dashboard</h1>
+    <h1><%= typeof dashboardTitle !== 'undefined' ? dashboardTitle : 'Dashboard' %></h1>
     <p>
-        Welcome
-        <strong><%= user && user.name ? user.name : 'User' %></strong>.
-        You are signed in as <strong><%= user && user.roleName ? user.roleName : 'User' %></strong>.
+        <%= typeof dashboardIntro !== 'undefined' && dashboardIntro
+            ? dashboardIntro
+            : `Welcome ${user && user.name ? user.name : 'User'}. You are signed in as ${user && user.roleName ? user.roleName : 'User'}.` %>
     </p>
 </section>
 
@@ -31,19 +31,42 @@
     </div>
 </section>
 
-<% if (user && user.roleName === 'Admin') { %>
+<% const roleCards = Array.isArray(dashboardCards) ? dashboardCards : []; %>
+<% if (roleCards.length > 0) { %>
 <section class="card glass-panel">
-    <h2>Admin Tools</h2>
-    <a href="/admin/dashboard" class="btn btn-primary">Admin Dashboard</a>
-    <a href="/admin/employees" class="btn">Manage Employees</a>
+    <h2><%= typeof dashboardSectionTitle !== 'undefined' ? dashboardSectionTitle : 'Role Tools' %></h2>
+    <div class="vehicle-grid">
+        <% roleCards.forEach((card) => { %>
+            <article class="vehicle-card">
+                <h3><%= card.title %></h3>
+                <% if (card.description) { %>
+                    <p><%= card.description %></p>
+                <% } %>
+                <% if (card.primaryLink && card.primaryLabel) { %>
+                    <a href="<%= card.primaryLink %>" class="btn btn-primary"><%= card.primaryLabel %></a>
+                <% } %>
+                <% if (card.secondaryLink && card.secondaryLabel) { %>
+                    <a href="<%= card.secondaryLink %>" class="btn"><%= card.secondaryLabel %></a>
+                <% } %>
+            </article>
+        <% }) %>
+    </div>
 </section>
 <% } %>
 
-<% if (user && user.roleName === 'Employee') { %>
+<% if (typeof showDataModelNotes !== 'undefined' && showDataModelNotes) { %>
 <section class="card glass-panel">
-    <h2>Employee Tools</h2>
-    <a href="/employee/dashboard" class="btn btn-primary">Employee Dashboard</a>
-    <a href="/employee/contact-form-submissions" class="btn">Contact Responses</a>
+    <h2>Required Data Model (Project Scope)</h2>
+    <p>The platform is designed around these core tables and relationships:</p>
+    <ul style="padding-left: 1.2rem;">
+        <li>Users table with a role field (User, Employee, Admin).</li>
+        <li>Vehicles table for core listing and pricing data.</li>
+        <li>Categories table linked to vehicles.</li>
+        <li>Reviews table linked to users and vehicles.</li>
+        <li>Service requests table linked to users with status tracking.</li>
+        <li>Contact messages table from the public form.</li>
+        <li>Vehicle images table with one-to-many relationship to vehicles.</li>
+    </ul>
 </section>
 <% } %>
 

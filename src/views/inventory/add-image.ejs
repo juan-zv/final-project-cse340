@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+
+<% const v = typeof vehicle !== 'undefined' ? vehicle : {}; %>
+
+<section class="card glass-panel">
+	<h1>Add Vehicle Image</h1>
+	<p>
+		Vehicle:
+		<strong><%= v.year || '' %> <%= v.make || '' %> <%= v.model || '' %></strong>
+	</p>
+</section>
+
+<section class="card glass-panel">
+	<form action="/catalog/<%= v.slug || '' %>/images" method="POST" style="display:grid; gap:0.75rem;">
+		<label for="image_path">Image Path</label>
+		<input id="image_path" name="image_path" type="text" placeholder="/images/vehicle-image.jpg" required>
+
+		<label for="image_label">Image Label (optional)</label>
+		<input id="image_label" name="image_label" type="text" maxlength="120" placeholder="Front angle">
+
+		<div>
+			<button type="submit" class="btn btn-primary">Add Image</button>
+			<a href="/catalog/<%= v.slug || '' %>" class="btn">Back to Vehicle</a>
+		</div>
+	</form>
+</section>
+
+<%- include('../partials/footer') %>

@@ -14,6 +14,7 @@
 		<textarea name="inv_description" placeholder="Description" required></textarea>
 		<input name="inv_image" type="text" placeholder="Image path e.g. /images/ford-f-150.jpg" required>
 		<input name="inv_thumbnail" type="text" placeholder="Thumbnail path" required>
+		<textarea name="vehicle_images" placeholder="Vehicle image paths, one per line or comma-separated"></textarea>
 		<input name="inv_price" type="number" min="0" step="0.01" placeholder="Price" required>
 		<input name="inv_miles" type="number" min="0" step="1" placeholder="Miles" required>
 		<label for="new_category_id">Category</label>
@@ -35,8 +36,11 @@
 <section class="card glass-panel">
 	<h2>Existing Vehicles</h2>
 	<% const vehicleItems = Array.isArray(vehicles) ? vehicles : []; %>
+	<% const imagesByVehicleId = (typeof vehicleImagesById !== 'undefined' && vehicleImagesById) ? vehicleImagesById : {}; %>
 	<% if (vehicleItems.length > 0) { %>
 		<% vehicleItems.forEach((vehicle) => { %>
+			<% const existingVehicleImages = Array.isArray(imagesByVehicleId[vehicle.inv_id]) ? imagesByVehicleId[vehicle.inv_id] : []; %>
+			<% const existingImagePaths = existingVehicleImages.map((image) => image.imagePath).join('\n'); %>
 			<article class="card glass-panel" style="margin-bottom: 1rem;">
 				<h3><%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %></h3>
 				<form action="/admin/inventory/<%= vehicle.inv_id %>/edit" method="POST" style="display:grid; gap:0.5rem;">
@@ -46,6 +50,7 @@
 					<textarea name="inv_description" required><%= vehicle.inv_description %></textarea>
 					<input name="inv_image" type="text" value="<%= vehicle.inv_image %>" required>
 					<input name="inv_thumbnail" type="text" value="<%= vehicle.inv_thumbnail %>" required>
+					<textarea name="vehicle_images" placeholder="Vehicle image paths, one per line or comma-separated"><%= existingImagePaths %></textarea>
 					<input name="inv_price" type="number" min="0" step="0.01" value="<%= vehicle.inv_price %>" required>
 					<input name="inv_miles" type="number" min="0" step="1" value="<%= vehicle.inv_miles %>" required>
 					<label for="category_<%= vehicle.inv_id %>">Category</label>

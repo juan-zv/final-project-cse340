@@ -51,6 +51,44 @@ const syncDefaultAccounts = async () => {
 };
 
 /**
+ * Ensures the one-to-many vehicle_images table exists for existing databases.
+ */
+const ensureVehicleImagesTable = async () => {
+    const inventoryTableCheck = await db.query(
+        "SELECT to_regclass('public.inventory') IS NOT NULL AS table_exists"
+    );
+
+    if (!inventoryTableCheck.rows[0]?.table_exists) {
+        return;
+    }
+
+    const tableCheck = await db.query(
+        "SELECT to_regclass('public.vehicle_images') IS NOT NULL AS table_exists"
+    );
+
+    if (tableCheck.rows[0]?.table_exists) {
+        return;
+    }
+
+    await db.query(`
+        CREATE TABLE vehicle_images (
+            image_id SERIAL PRIMARY KEY,
+            inv_id INTEGER NOT NULL,
+            image_path VARCHAR(255) NOT NULL,
+            image_label VARCHAR(120),
+            sort_order INTEGER DEFAULT 1,
+            is_primary BOOLEAN DEFAULT false,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_vehicle_images_inventory
+                FOREIGN KEY (inv_id)
+                REFERENCES inventory(inv_id)
+                ON DELETE CASCADE
+        )
+    `);
+    console.log('vehicle_images table created');
+};
+
+/**
  * Seeds sample inventory rows when the inventory table exists but is empty.
  */
 const syncSampleInventory = async () => {
@@ -116,11 +154,55 @@ const syncSampleInventory = async () => {
 };
 
 /**
+ * Backfills the vehicle_images table from inventory fallback image fields.
+ */
+const syncSampleVehicleImages = async () => {
+    const vehicleImagesTableCheck = await db.query(
+        "SELECT to_regclass('public.vehicle_images') IS NOT NULL AS table_exists"
+    );
+
+    if (!vehicleImagesTableCheck.rows[0]?.table_exists) {
+        return;
+    }
+
+    const imagesDataCheck = await db.query(
+        'SELECT EXISTS (SELECT 1 FROM vehicle_images LIMIT 1) AS has_data'
+    );
+
+    if (imagesDataCheck.rows[0]?.has_data) {
+        return;
+    }
+
+    const query = `
+        INSERT INTO vehicle_images (inv_id, image_path, image_label, sort_order, is_primary)
+        SELECT
+            inv_id,
+            inv_image,
+            'Primary image',
+            1,
+            true
+        FROM inventory
+        UNION ALL
+        SELECT
+            inv_id,
+            inv_thumbnail,
+            'Thumbnail image',
+            2,
+            false
+        FROM inventory
+    `;
+
+    await db.query(query);
+    console.log('Sample vehicle images synced');
+};
+
+/**
  * Sets up the database by running the seed.sql file if needed.
  * Checks if categories and inventory data exist before reseeding.
  */
 const setupDatabase = async () => {
     // First check if the expected table exists to avoid relation-not-found errors.
+    await ensureVehicleImagesTable();
     const tableCheck = await db.query(
         "SELECT to_regclass('public.categories') IS NOT NULL AS table_exists"
     );
@@ -137,6 +219,8 @@ const setupDatabase = async () => {
         console.log('Database already seeded');
         await syncDefaultAccounts();
         await syncSampleInventory();
+        await ensureVehicleImagesTable();
+        await syncSampleVehicleImages();
         return true;
     }
     
@@ -157,6 +241,8 @@ const setupDatabase = async () => {
     console.log('Database seeded successfully');
     await syncDefaultAccounts();
     await syncSampleInventory();
+    await ensureVehicleImagesTable();
+    await syncSampleVehicleImages();
     
     return true;
 };
