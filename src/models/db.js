@@ -6,8 +6,30 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Read the CA certificate content
-const caCert = fs.readFileSync(path.join(__dirname, '../../bin', 'byuicse-psql-cert.pem'));
+const certPath = path.join(__dirname, '../../bin', 'byuicse-psql-cert.pem');
+const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath) : null;
+const connectionString = process.env.DB_URL || process.env.DATABASE_URL;
+
+if (!connectionString) {
+    throw new Error('Missing database connection string. Set DB_URL or DATABASE_URL.');
+}
+
+const isRender = process.env.RENDER === 'true';
+const isProduction = process.env.NODE_ENV?.toLowerCase() === 'production';
+
+let ssl = false;
+if (process.env.DB_SSL === 'false') {
+    ssl = false;
+} else if ((isRender || isProduction) && !caCert) {
+    // Render Postgres commonly uses managed certificates; this avoids CA-file coupling.
+    ssl = { rejectUnauthorized: false };
+} else if (caCert) {
+    ssl = {
+        ca: caCert,
+        rejectUnauthorized: true,
+        checkServerIdentity: () => { return undefined; }
+    };
+}
 
 /**
  * Connection pool for PostgreSQL database.
@@ -21,12 +43,11 @@ const caCert = fs.readFileSync(path.join(__dirname, '../../bin', 'byuicse-psql-c
  * postgresql://username:password@host:port/database
  */
 const pool = new Pool({
-    connectionString: process.env.DB_URL,
-    ssl: {
-        ca: caCert,  // Use the certificate content, not the file path
-        rejectUnauthorized: true,  // Keep this true for proper security
-        checkServerIdentity: () => { return undefined; }  // Skip hostname verification but keep cert chain validation
-    }
+    connectionString,
+    max: Number(process.env.DB_POOL_MAX || 5),
+    idleTimeoutMillis: Number(process.env.DB_POOL_IDLE_MS || 10000),
+    connectionTimeoutMillis: Number(process.env.DB_POOL_CONNECT_TIMEOUT_MS || 5000),
+    ssl
 });
 
 /**
@@ -36,7 +57,7 @@ const pool = new Pool({
  */
 let db = null;
 
-if (process.env.NODE_ENV.includes('dev') && process.env.ENABLE_SQL_LOGGING === 'true') {
+if (process.env.NODE_ENV?.includes('dev') && process.env.ENABLE_SQL_LOGGING === 'true') {
     /**
      * In development mode, we wrap the pool to provide query logging.
      * This helps with debugging by showing all executed queries in the console.
@@ -76,3 +97,4 @@ if (process.env.NODE_ENV.includes('dev') && process.env.ENABLE_SQL_LOGGING === '
 
 export default db;
 export { caCert };
+export { pool as pgPool };

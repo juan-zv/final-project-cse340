@@ -10,7 +10,7 @@ import { addLocalVariables } from './src/middleware/global.js';
 // Database
 import { setupDatabase, testConnection } from './src/models/setup.js';
 import connectPgSimple from 'connect-pg-simple';
-import { caCert } from './src/models/db.js';
+import { pgPool } from './src/models/db.js';
 
 // Utils / Middleware
 import { startSessionCleanup } from './src/utils/session-cleanup.js';
@@ -30,17 +30,10 @@ const pgSession = connectPgSimple(session);
 // Session Configuration using Database
 app.use(session({
     store: new pgSession({
-        conObject: {
-            connectionString: process.env.DB_URL,
-            // Configure SSL for session store connection (required by BYU-I databases)
-            ssl: {
-                ca: caCert,
-                rejectUnauthorized: true,
-                checkServerIdentity: () => { return undefined; }
-            }
-        },
+        pool: pgPool,
         tableName: 'session',
-        createTableIfMissing: true
+        createTableIfMissing: true,
+        pruneSessionInterval: false
     }),
     secret: process.env.SESSION_SECRET || 'fallback_secret',
     resave: false,
@@ -89,12 +82,13 @@ app.use((err, req, res, next) => {
     
     // Determine status and template
     const status = err.status || 500;
-    const template = status === 404 ? '404' : 'error'; // ensure template matches typical names, or use the example 'errors/404' etc
+    const template = status === 404 ? 'errors/404' : 'errors/500';
     
     // Prepare data for the template
     const context = {
         title: status === 404 ? 'Page Not Found' : 'Server Error',
         message: NODE_ENV === 'production' && status === 500 ? 'An error occurred' : err.message,
+        error: err.message,
         stack: NODE_ENV === 'production' ? null : err.stack,
         NODE_ENV 
     };
