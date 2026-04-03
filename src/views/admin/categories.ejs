@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Category Management</h1>
+	<p>Add, edit, and delete vehicle categories.</p>
+</section>
+
+<section class="card glass-panel">
+	<h2>Add Category</h2>
+	<form action="/admin/categories" method="POST">
+		<label for="category_name">Category Name</label>
+		<input id="category_name" name="category_name" type="text" maxlength="50" required placeholder="e.g. Trucks">
+		<button type="submit" class="btn btn-primary">Add Category</button>
+	</form>
+</section>
+
+<section class="card glass-panel">
+	<h2>Existing Categories</h2>
+	<% const categoryItems = Array.isArray(categories) ? categories : []; %>
+	<% if (categoryItems.length > 0) { %>
+		<table style="width:100%; border-collapse: collapse;">
+			<thead>
+				<tr>
+					<th style="text-align:left; padding: 0.5rem;">ID</th>
+					<th style="text-align:left; padding: 0.5rem;">Name</th>
+					<th style="text-align:left; padding: 0.5rem;">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% categoryItems.forEach((category) => { %>
+					<tr>
+						<td style="padding: 0.5rem;"><%= category.category_id %></td>
+						<td style="padding: 0.5rem;">
+							<form action="/admin/categories/<%= category.category_id %>/edit" method="POST" style="display:inline;">
+								<input type="text" name="category_name" value="<%= category.category_name %>" maxlength="50" required>
+								<button type="submit" class="btn">Save</button>
+							</form>
+						</td>
+						<td style="padding: 0.5rem;">
+							<form action="/admin/categories/<%= category.category_id %>/delete" method="POST" style="display:inline;">
+								<button type="submit" class="btn">Delete</button>
+							</form>
+						</td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+	<% } else { %>
+		<p>No categories found.</p>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

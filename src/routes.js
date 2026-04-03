@@ -19,7 +19,19 @@ import {
     buildServiceRequestEdit,
     updateServiceRequest
 } from './controllers/services/index.js';
-import { buildAdminDashboard, buildEmployeesList } from './controllers/admin/index.js';
+import {
+    buildAdminDashboard,
+    buildEmployeesList,
+    buildCategoriesManagement,
+    createCategoryAction,
+    updateCategoryAction,
+    deleteCategoryAction,
+    buildInventoryManagement,
+    createVehicleAction,
+    updateVehicleAction,
+    deleteVehicleAction,
+    buildSystemActivity
+} from './controllers/admin/index.js';
 import { buildEmployeeDashboard, buildContactSubmissions } from './controllers/employee/index.js';
 import {
     reviewValidation,
@@ -85,6 +97,15 @@ router.get('/logout', processLogout);
 router.get('/dashboard', requireLogin, showDashboard);
 router.get('/admin/dashboard', requireAdmin, buildAdminDashboard);
 router.get('/admin/employees', requireAdmin, buildEmployeesList);
+router.get('/admin/categories', requireAdmin, buildCategoriesManagement);
+router.post('/admin/categories', requireAdmin, createCategoryAction);
+router.post('/admin/categories/:categoryId/edit', requireAdmin, updateCategoryAction);
+router.post('/admin/categories/:categoryId/delete', requireAdmin, deleteCategoryAction);
+router.get('/admin/inventory', requireAdmin, buildInventoryManagement);
+router.post('/admin/inventory', requireAdmin, createVehicleAction);
+router.post('/admin/inventory/:invId/edit', requireAdmin, updateVehicleAction);
+router.post('/admin/inventory/:invId/delete', requireAdmin, deleteVehicleAction);
+router.get('/admin/system', requireAdmin, buildSystemActivity);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
 router.get('/user/dashboard', requireLogin, (req, res) => res.redirect('/dashboard'));

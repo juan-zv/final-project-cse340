@@ -1,0 +1,90 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>System Activity and User Data</h1>
+	<p>Owner visibility into all key entities and recent activity.</p>
+</section>
+
+<section class="card glass-panel">
+	<h2>Totals</h2>
+	<% const counts = (activity && activity.counts) ? activity.counts : {}; %>
+	<ul style="padding-left: 1.2rem;">
+		<li>Accounts: <strong><%= counts.total_accounts || 0 %></strong></li>
+		<li>Categories: <strong><%= counts.total_categories || 0 %></strong></li>
+		<li>Inventory Vehicles: <strong><%= counts.total_inventory || 0 %></strong></li>
+		<li>Reviews: <strong><%= counts.total_reviews || 0 %></strong></li>
+		<li>Service Requests: <strong><%= counts.total_service_requests || 0 %></strong></li>
+		<li>Contact Messages: <strong><%= counts.total_contact_messages || 0 %></strong></li>
+	</ul>
+</section>
+
+<section class="card glass-panel">
+	<h2>Recent Accounts</h2>
+	<% const recentAccounts = (activity && Array.isArray(activity.recentAccounts)) ? activity.recentAccounts : []; %>
+	<% if (recentAccounts.length > 0) { %>
+		<ul style="padding-left: 1.2rem;">
+			<% recentAccounts.forEach((account) => { %>
+				<li>
+					<%= account.account_firstname %> <%= account.account_lastname %>
+					(<%= account.account_email %>) - <%= account.account_type %>
+				</li>
+			<% }) %>
+		</ul>
+	<% } else { %>
+		<p>No account activity available.</p>
+	<% } %>
+</section>
+
+<section class="card glass-panel">
+	<h2>Recent Reviews</h2>
+	<% const recentReviews = (activity && Array.isArray(activity.recentReviews)) ? activity.recentReviews : []; %>
+	<% if (recentReviews.length > 0) { %>
+		<ul style="padding-left: 1.2rem;">
+			<% recentReviews.forEach((review) => { %>
+				<li>
+					<%= review.account_firstname %> <%= review.account_lastname %> on
+					<%= review.inv_year %> <%= review.inv_make %> <%= review.inv_model %>
+					(<%= review.review_date ? new Date(review.review_date).toLocaleDateString() : 'N/A' %>)
+				</li>
+			<% }) %>
+		</ul>
+	<% } else { %>
+		<p>No review activity available.</p>
+	<% } %>
+</section>
+
+<section class="card glass-panel">
+	<h2>Recent Service Requests</h2>
+	<% const recentServices = (activity && Array.isArray(activity.recentServices)) ? activity.recentServices : []; %>
+	<% if (recentServices.length > 0) { %>
+		<ul style="padding-left: 1.2rem;">
+			<% recentServices.forEach((request) => { %>
+				<li>
+					<%= request.account_firstname %> <%= request.account_lastname %>:
+					<%= request.service_type %> - <%= request.service_status %>
+				</li>
+			<% }) %>
+		</ul>
+	<% } else { %>
+		<p>No service request activity available.</p>
+	<% } %>
+</section>
+
+<section class="card glass-panel">
+	<h2>Recent Contact Messages</h2>
+	<% const recentContacts = (activity && Array.isArray(activity.recentContacts)) ? activity.recentContacts : []; %>
+	<% if (recentContacts.length > 0) { %>
+		<ul style="padding-left: 1.2rem;">
+			<% recentContacts.forEach((msg) => { %>
+				<li>
+					<%= msg.sender_name %> (<%= msg.sender_email %>) -
+					<%= msg.is_read ? 'Read' : 'Open' %>
+				</li>
+			<% }) %>
+		</ul>
+	<% } else { %>
+		<p>No contact activity available.</p>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>
