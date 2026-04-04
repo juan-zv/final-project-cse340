@@ -80,14 +80,131 @@ const showDashboard = (req, res) => {
         delete sessionData.user.password;
     }
 
+    const roleName = String(user?.roleName || user?.account_type || 'User');
+    const normalizedRole = roleName.toLowerCase();
+
+    const roleConfig = {
+        admin: {
+            dashboardTitle: 'Admin Dashboard',
+            dashboardIntro: 'Complete system control overview.',
+            dashboardSectionTitle: 'Admin Tools',
+            dashboardCards: [
+                {
+                    title: 'Inventory',
+                    description: 'Manage vehicle records and pricing.',
+                    primaryLink: '/admin/inventory',
+                    primaryLabel: 'Open Inventory'
+                },
+                {
+                    title: 'Categories',
+                    description: 'Create or remove inventory categories.',
+                    primaryLink: '/admin/categories',
+                    primaryLabel: 'Manage Categories'
+                },
+                {
+                    title: 'Services',
+                    description: 'Maintain the dealership service catalog.',
+                    primaryLink: '/admin/services',
+                    primaryLabel: 'Manage Services'
+                },
+                {
+                    title: 'System Activity',
+                    description: 'Review accounts, requests, and platform data.',
+                    primaryLink: '/admin/system',
+                    primaryLabel: 'View Activity'
+                },
+                {
+                    title: 'Staff Accounts',
+                    description: 'Review and manage employee access.',
+                    primaryLink: '/admin/employees',
+                    primaryLabel: 'Manage Staff'
+                }
+            ],
+            showDataModelNotes: true
+        },
+        employee: {
+            dashboardTitle: 'Employee Dashboard',
+            dashboardIntro: 'Handle service requests, inventory updates, and customer communication.',
+            dashboardSectionTitle: 'Employee Tools',
+            dashboardCards: [
+                {
+                    title: 'Service Queue',
+                    description: 'Review and update assigned service requests.',
+                    primaryLink: '/services',
+                    primaryLabel: 'Open Queue'
+                },
+                {
+                    title: 'Vehicle Updates',
+                    description: 'Update vehicle descriptions, price, and availability.',
+                    primaryLink: '/employee/vehicles',
+                    primaryLabel: 'Edit Vehicles'
+                },
+                {
+                    title: 'Review Moderation',
+                    description: 'Monitor customer reviews for quality and policy.',
+                    primaryLink: '/reviews',
+                    primaryLabel: 'Moderate Reviews'
+                },
+                {
+                    title: 'Contact Inbox',
+                    description: 'Read and follow up on contact submissions.',
+                    primaryLink: '/employee/contact-form-submissions',
+                    primaryLabel: 'View Messages'
+                }
+            ],
+            showDataModelNotes: false
+        },
+        user: {
+            dashboardTitle: 'User Dashboard',
+            dashboardIntro: `Welcome ${user && user.name ? user.name : 'Driver'}. Manage your reviews and service requests here.`,
+            dashboardSectionTitle: 'Your Tools',
+            dashboardCards: [
+                {
+                    title: 'Browse Inventory',
+                    description: 'View available vehicles and details.',
+                    primaryLink: '/catalog',
+                    primaryLabel: 'Open Catalog'
+                },
+                {
+                    title: 'My Reviews',
+                    description: 'Create and manage your vehicle reviews.',
+                    primaryLink: '/reviews',
+                    primaryLabel: 'Open Reviews'
+                },
+                {
+                    title: 'Service Requests',
+                    description: 'Track or edit your current requests.',
+                    primaryLink: '/services',
+                    primaryLabel: 'Open Services'
+                },
+                {
+                    title: 'Request Service',
+                    description: 'Submit a new maintenance request.',
+                    primaryLink: '/services/request',
+                    primaryLabel: 'New Request'
+                },
+                {
+                    title: 'Contact Team',
+                    description: 'Send a message to the dealership.',
+                    primaryLink: '/contact',
+                    primaryLabel: 'Open Contact'
+                }
+            ],
+            showDataModelNotes: false
+        }
+    };
+
+    const dashboardConfig = roleConfig[normalizedRole] || roleConfig.user;
+
     res.render('dashboard', {
         title: 'Dashboard',
         user,
         sessionData,
-        dashboardTitle: 'Dashboard',
-        dashboardIntro: `Welcome ${user && user.name ? user.name : 'User'}. You are signed in as ${user && user.roleName ? user.roleName : 'User'}.`,
-        dashboardSectionTitle: 'Role Tools',
-        dashboardCards: []
+        dashboardTitle: dashboardConfig.dashboardTitle,
+        dashboardIntro: dashboardConfig.dashboardIntro,
+        dashboardSectionTitle: dashboardConfig.dashboardSectionTitle,
+        dashboardCards: dashboardConfig.dashboardCards,
+        showDataModelNotes: dashboardConfig.showDataModelNotes
     });
 };
 

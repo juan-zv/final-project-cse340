@@ -1,6 +1,7 @@
 import { createServiceRequest } from '../../models/services/index.js';
-import { getAllServiceRequests, getServiceRequestsByAccount } from '../../models/services/index.js';
-import { getServiceRequestById, updateServiceRequestStatus } from '../../models/services/index.js';
+import { getAllServiceRequests } from '../../models/services/index.js';
+import { getServiceRequestsByAccount } from '../../models/services/index.js';
+import { deleteServiceRequest, getServiceRequestById, updateServiceRequestStatus } from '../../models/services/index.js';
 import { getServiceCatalog } from '../../models/services/index.js';
 import { getInventory } from '../../models/inventory/index.js';
 import { validationResult } from 'express-validator';
@@ -8,34 +9,27 @@ import { validationResult } from 'express-validator';
 const getSessionUserId = (req) => req.session?.user?.id || req.session?.user?.account_id;
 const getSessionRole = (req) => req.session?.user?.roleName || req.session?.user?.account_type || req.session?.user?.role;
 const canManageAll = (role) => role === 'Employee' || role === 'Admin';
-const toDisplayStatus = (status) => (status === 'Submitted' ? 'Open' : status);
-const toDbStatus = (status) => (String(status || '').toLowerCase() === 'open' ? 'Submitted' : status);
+const allowedServiceStatuses = ['Submitted', 'In Progress', 'Completed'];
 
 export const buildServicesList = async (req, res, next) => {
 	try {
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		const isManagerView = canManageAll(role);
+		const managerMode = canManageAll(role);
 		const sortBy = String(req.query.sortBy || 'newest').toLowerCase();
-		const status = String(req.query.status || '').trim().toLowerCase();
+		const status = String(req.query.status || '').trim();
 		const serviceId = Number.parseInt(String(req.query.serviceId || ''), 10);
 
 		const [serviceRequests, serviceOptions] = await Promise.all([
-			canManageAll(role)
-				? getAllServiceRequests()
-				: getServiceRequestsByAccount(accountId),
+			managerMode ? getAllServiceRequests() : getServiceRequestsByAccount(accountId),
 			getServiceCatalog()
 		]);
 
 		const filteredRequests = serviceRequests
-			.map((request) => ({
-				...request,
-				displayStatus: toDisplayStatus(request.serviceStatus)
-			}))
 			.filter((request) => {
-				const normalizedStatus = String(request.displayStatus || '').toLowerCase();
+				const requestStatus = String(request.serviceStatus || '');
 
-				if (status && normalizedStatus !== status) {
+				if (status && requestStatus !== status) {
 					return false;
 				}
 				if (Number.isInteger(serviceId) && serviceId > 0 && request.serviceId !== serviceId) {
@@ -46,7 +40,7 @@ export const buildServicesList = async (req, res, next) => {
 
 		const byNewest = (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0);
 		const byOldest = (a, b) => new Date(a.updatedAt || a.createdAt || 0) - new Date(b.updatedAt || b.createdAt || 0);
-		const byStatus = (a, b) => String(a.displayStatus || '').localeCompare(String(b.displayStatus || ''));
+		const byStatus = (a, b) => String(a.serviceStatus || '').localeCompare(String(b.serviceStatus || ''));
 		const byType = (a, b) => String(a.serviceType || '').localeCompare(String(b.serviceType || ''));
 
 		const sortMap = {
@@ -62,12 +56,12 @@ export const buildServicesList = async (req, res, next) => {
 			title: 'Services',
 			serviceRequests: filteredRequests,
 			serviceOptions,
+			managerMode,
 			filters: {
 				sortBy,
 				status: String(req.query.status || ''),
 				serviceId: String(req.query.serviceId || '')
-			},
-			isManagerView
+			}
 		});
 	} catch (error) {
 		next(error);
@@ -136,18 +130,15 @@ export const buildServiceRequestEdit = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (request.accountId !== accountId && !canManageAll(role)) {
+		const managerMode = canManageAll(role);
+		if (request.accountId !== accountId && !managerMode) {
 			return res.status(403).send('Forbidden: You do not have permission to access this service request.');
 		}
 
-		const requestWithDisplayStatus = {
-			...request,
-			displayStatus: toDisplayStatus(request.serviceStatus)
-		};
-
 		res.render('services/edit', {
 			title: 'Edit Service Request',
-			request: requestWithDisplayStatus
+			request,
+			managerMode
 		});
 	} catch (error) {
 		next(error);
@@ -171,18 +162,52 @@ export const updateServiceRequest = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const role = getSessionRole(req);
-		if (request.accountId !== accountId && !canManageAll(role)) {
+		const managerMode = canManageAll(role);
+		if (request.accountId !== accountId && !managerMode) {
 			return res.status(403).send('Forbidden: You do not have permission to update this service request.');
+		}
+
+		let nextStatus = request.serviceStatus;
+		if (managerMode && req.body.service_status) {
+			nextStatus = req.body.service_status;
+		}
+		if (!allowedServiceStatuses.includes(nextStatus)) {
+			req.flash('error', 'Invalid service status.');
+			return res.redirect(`/services/${req.params.requestId}/edit`);
 		}
 
 		await updateServiceRequestStatus(
 			req.params.requestId,
-			toDbStatus(req.body.service_status),
+			nextStatus,
 			req.body.request_notes
 		);
 
 		req.flash('success', 'Service request updated successfully.');
 		res.redirect('/services');
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const deleteServiceRequestAction = async (req, res, next) => {
+	try {
+		const request = await getServiceRequestById(req.params.requestId);
+		if (Object.keys(request).length === 0) {
+			const err = new Error('Service request not found');
+			err.status = 404;
+			return next(err);
+		}
+
+		const accountId = getSessionUserId(req);
+		const role = getSessionRole(req);
+		const managerMode = canManageAll(role);
+		if (request.accountId !== accountId && !managerMode) {
+			return res.status(403).send('Forbidden: You do not have permission to delete this service request.');
+		}
+
+		await deleteServiceRequest(req.params.requestId);
+		req.flash('success', 'Service request deleted successfully.');
+		return res.redirect('/services');
 	} catch (error) {
 		next(error);
 	}

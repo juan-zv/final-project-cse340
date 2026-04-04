@@ -10,46 +10,21 @@
     </p>
 </section>
 
-<section class="card glass-panel">
-    <h2>Quick Actions</h2>
-    <div class="vehicle-grid">
-        <article class="vehicle-card">
-            <h3>Browse Inventory</h3>
-            <a href="/catalog" class="btn btn-primary">Open Catalog</a>
-        </article>
-        <article class="vehicle-card">
-            <h3>My Reviews</h3>
-            <a href="/reviews" class="btn">View Reviews</a>
-        </article>
-        <article class="vehicle-card">
-            <h3>Service Requests</h3>
-			<a href="/services" class="btn">Track Requests</a>
-        </article>
-        <article class="vehicle-card">
-            <h3>Contact Team</h3>
-            <a href="/contact" class="btn">Send Message</a>
-        </article>
-    </div>
-</section>
-
 <% const roleCards = typeof dashboardCards !== 'undefined' && Array.isArray(dashboardCards) ? dashboardCards : []; %>
 <% if (roleCards.length > 0) { %>
 <section class="card glass-panel">
     <h2><%= typeof dashboardSectionTitle !== 'undefined' ? dashboardSectionTitle : 'Role Tools' %></h2>
-    <div class="vehicle-grid">
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.7rem;">
         <% roleCards.forEach((card) => { %>
-            <article class="vehicle-card">
+            <a
+                href="<%= card.primaryLink || card.secondaryLink || '/dashboard' %>"
+                style="display:block; text-decoration:none; color:inherit; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:0.7rem 0.75rem; background:rgba(17,25,40,0.45); min-height: 92px;"
+            >
                 <h3><%= card.title %></h3>
                 <% if (card.description) { %>
-                    <p><%= card.description %></p>
+                    <p style="margin-bottom:0; color: rgba(243, 244, 246, 0.82);"><%= card.description %></p>
                 <% } %>
-                <% if (card.primaryLink && card.primaryLabel) { %>
-                    <a href="<%= card.primaryLink %>" class="btn btn-primary"><%= card.primaryLabel %></a>
-                <% } %>
-                <% if (card.secondaryLink && card.secondaryLabel) { %>
-                    <a href="<%= card.secondaryLink %>" class="btn"><%= card.secondaryLabel %></a>
-                <% } %>
-            </article>
+            </a>
         <% }) %>
     </div>
 </section>

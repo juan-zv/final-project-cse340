@@ -36,40 +36,14 @@
 <section class="card glass-panel">
 	<h2>Existing Vehicles</h2>
 	<% const vehicleItems = Array.isArray(vehicles) ? vehicles : []; %>
-	<% const imagesByVehicleId = (typeof vehicleImagesById !== 'undefined' && vehicleImagesById) ? vehicleImagesById : {}; %>
 	<% if (vehicleItems.length > 0) { %>
 		<% vehicleItems.forEach((vehicle) => { %>
-			<% const existingVehicleImages = Array.isArray(imagesByVehicleId[vehicle.inv_id]) ? imagesByVehicleId[vehicle.inv_id] : []; %>
-			<% const existingImagePaths = existingVehicleImages.map((image) => image.imagePath).join('\n'); %>
 			<article class="card glass-panel" style="margin-bottom: 1rem;">
 				<h3><%= vehicle.inv_year %> <%= vehicle.inv_make %> <%= vehicle.inv_model %></h3>
-				<form action="/admin/inventory/<%= vehicle.inv_id %>/edit" method="POST" style="display:grid; gap:0.5rem;">
-					<input name="inv_make" type="text" value="<%= vehicle.inv_make %>" required>
-					<input name="inv_model" type="text" value="<%= vehicle.inv_model %>" required>
-					<input name="inv_year" type="text" value="<%= vehicle.inv_year %>" required>
-					<textarea name="inv_description" required><%= vehicle.inv_description %></textarea>
-					<input name="inv_image" type="text" value="<%= vehicle.inv_image %>" required>
-					<input name="inv_thumbnail" type="text" value="<%= vehicle.inv_thumbnail %>" required>
-					<textarea name="vehicle_images" placeholder="Vehicle image paths, one per line or comma-separated"><%= existingImagePaths %></textarea>
-					<input name="inv_price" type="number" min="0" step="0.01" value="<%= vehicle.inv_price %>" required>
-					<input name="inv_miles" type="number" min="0" step="1" value="<%= vehicle.inv_miles %>" required>
-					<label for="category_<%= vehicle.inv_id %>">Category</label>
-					<select id="category_<%= vehicle.inv_id %>" name="category_id" required>
-						<% (categories || []).forEach((category) => { %>
-							<option value="<%= category.category_id %>" <%= Number(vehicle.category_id) === Number(category.category_id) ? 'selected' : '' %>>
-								<%= category.category_name %>
-							</option>
-						<% }) %>
-					</select>
-					<label for="available_<%= vehicle.inv_id %>">Availability</label>
-					<select id="available_<%= vehicle.inv_id %>" name="is_available" required>
-						<option value="true" <%= vehicle.is_available ? 'selected' : '' %>>Available</option>
-						<option value="false" <%= !vehicle.is_available ? 'selected' : '' %>>Unavailable</option>
-					</select>
-					<div>
-						<button type="submit" class="btn btn-primary">Save Vehicle</button>
-					</div>
-				</form>
+				<div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
+					<a class="btn btn-primary" href="/catalog/vehicle-<%= vehicle.inv_id %>/edit">Edit Vehicle</a>
+					<a class="btn" href="/catalog/vehicle-<%= vehicle.inv_id %>">View Detail</a>
+				</div>
 				<form action="/admin/inventory/<%= vehicle.inv_id %>/delete" method="POST" style="margin-top: 0.5rem;">
 					<button type="submit" class="btn">Delete Vehicle</button>
 				</form>

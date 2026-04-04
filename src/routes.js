@@ -1,4 +1,4 @@
-import { buildCatalogList, buildCatalogDetail, buildAddVehicleImage, addVehicleImageAction } from './controllers/inventory/index.js';
+import { buildCatalogList, buildCatalogDetail, buildAddVehicleImage, addVehicleImageAction, buildInventoryEdit, updateInventoryEdit } from './controllers/inventory/index.js';
 import { homePage } from './controllers/index.js';
 import registrationRoutes from './controllers/forms/registration.js';
 import { showAllUsers } from './controllers/forms/registration.js';
@@ -18,7 +18,8 @@ import {
     buildServiceRequest,
     submitServiceRequest,
     buildServiceRequestEdit,
-    updateServiceRequest
+    updateServiceRequest,
+    deleteServiceRequestAction
 } from './controllers/services/index.js';
 import {
     buildAdminDashboard,
@@ -39,9 +40,7 @@ import {
 } from './controllers/admin/index.js';
 import {
     buildEmployeeDashboard,
-    buildContactSubmissions,
-    buildEmployeeVehicleEditing,
-    updateEmployeeVehicleDetailsAction
+    buildContactSubmissions
 } from './controllers/employee/index.js';
 import { buildUserDashboard } from './controllers/user/index.js';
 import {
@@ -93,6 +92,8 @@ router.get('/', homePage);
 // Course catalog routes
 router.get('/catalog', buildCatalogList);
 router.get('/catalog/:slugId', buildCatalogDetail);
+router.get('/catalog/:slugId/edit', requireEmployee, buildInventoryEdit);
+router.post('/catalog/:slugId/edit', requireEmployee, updateInventoryEdit);
 router.get('/catalog/:slugId/images/new', requireEmployee, buildAddVehicleImage);
 router.post('/catalog/:slugId/images', requireEmployee, addVehicleImageAction);
 
@@ -122,13 +123,13 @@ router.post('/admin/inventory', requireAdmin, createVehicleAction);
 router.post('/admin/inventory/:invId/edit', requireAdmin, updateVehicleAction);
 router.post('/admin/inventory/:invId/delete', requireAdmin, deleteVehicleAction);
 router.get('/admin/system', requireAdmin, buildSystemActivity);
+router.get('/admin/contact-form-submissions', requireAdmin, buildContactSubmissions);
 router.post('/admin/system/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
 router.post('/admin/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
+router.post('/employee/contact-messages/:messageId/delete', requireEmployee, deleteContactMessageAction);
 router.get('/dashboard/users', requireAdmin, showAllUsers);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
-router.get('/employee/vehicles', requireEmployee, buildEmployeeVehicleEditing);
-router.post('/employee/vehicles/:invId/edit', requireEmployee, updateEmployeeVehicleDetailsAction);
 router.get('/user/dashboard', requireLogin, buildUserDashboard);
 
 // Reviews
@@ -148,8 +149,10 @@ router.post('/services/request', requireLogin, serviceRequestValidation, submitS
 router.get('/service-requests', requireLogin, (req, res) => res.redirect('/services'));
 router.get('/service-requests/:requestId/edit', requireLogin, (req, res) => res.redirect(`/services/${req.params.requestId}/edit`));
 router.post('/service-requests/:requestId/edit', requireLogin, (req, res) => res.redirect(307, `/services/${req.params.requestId}/edit`));
+router.post('/service-requests/:requestId/delete', requireLogin, (req, res) => res.redirect(307, `/services/${req.params.requestId}/delete`));
 router.get('/services/:requestId/edit', requireLogin, buildServiceRequestEdit);
 router.post('/services/:requestId/edit', requireLogin, serviceRequestUpdateValidation, updateServiceRequest);
+router.post('/services/:requestId/delete', requireLogin, deleteServiceRequestAction);
 
 // Export the router to be used in the main app
 export default router;

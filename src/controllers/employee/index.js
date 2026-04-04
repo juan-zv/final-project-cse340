@@ -11,9 +11,9 @@ export const buildEmployeeDashboard = async (req, res, next) => {
 			dashboardCards: [
 				{
 					title: 'Vehicle Editing',
-					description: 'Update pricing, descriptions, and availability for listed vehicles.',
-					primaryLink: '/employee/vehicles',
-					primaryLabel: 'Open Vehicle Inventory',
+					description: 'Open the catalog and edit one vehicle at a time from its detail page.',
+					primaryLink: '/catalog',
+					primaryLabel: 'Open Catalog',
 					secondaryLink: '/employee/dashboard',
 					secondaryLabel: 'Back to Shared Dashboard'
 				},

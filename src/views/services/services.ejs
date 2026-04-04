@@ -33,32 +33,38 @@
 
 <section class="card glass-panel">
 	<% const filterValues = (typeof filters !== 'undefined' && filters) ? filters : {}; %>
-	<form method="GET" action="/services" style="display:grid; gap:0.75rem;">
-		<label for="sortBy">Sort By</label>
-		<select id="sortBy" name="sortBy">
-			<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
-			<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
-			<option value="status" <%= filterValues.sortBy === 'status' ? 'selected' : '' %>>Status</option>
-			<option value="type" <%= filterValues.sortBy === 'type' ? 'selected' : '' %>>Service Type</option>
-		</select>
+	<form method="GET" action="/services" style="display:flex; flex-wrap:wrap; gap:0.75rem 1rem; align-items:flex-end;">
+		<div style="display:grid; gap:0.35rem; min-width:180px; flex:0 1 220px;">
+			<label for="sortBy">Sort By</label>
+			<select id="sortBy" name="sortBy">
+				<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
+				<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
+				<option value="status" <%= filterValues.sortBy === 'status' ? 'selected' : '' %>>Status</option>
+				<option value="type" <%= filterValues.sortBy === 'type' ? 'selected' : '' %>>Service Type</option>
+			</select>
+		</div>
 
-		<label for="status">Filter Status</label>
-		<select id="status" name="status">
-			<option value="" <%= !filterValues.status ? 'selected' : '' %>>All</option>
-			<option value="open" <%= String(filterValues.status || '').toLowerCase() === 'open' ? 'selected' : '' %>>Open</option>
-			<option value="in progress" <%= String(filterValues.status || '').toLowerCase() === 'in progress' ? 'selected' : '' %>>In Progress</option>
-			<option value="completed" <%= String(filterValues.status || '').toLowerCase() === 'completed' ? 'selected' : '' %>>Completed</option>
-		</select>
+		<div style="display:grid; gap:0.35rem; min-width:180px; flex:0 1 220px;">
+			<label for="status">Filter Status</label>
+			<select id="status" name="status">
+				<option value="" <%= !filterValues.status ? 'selected' : '' %>>All</option>
+				<option value="Submitted" <%= String(filterValues.status || '') === 'Submitted' ? 'selected' : '' %>>Submitted</option>
+				<option value="In Progress" <%= String(filterValues.status || '') === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+				<option value="Completed" <%= String(filterValues.status || '') === 'Completed' ? 'selected' : '' %>>Completed</option>
+			</select>
+		</div>
 
-		<label for="serviceId">Filter Service</label>
-		<select id="serviceId" name="serviceId">
-			<option value="" <%= !filterValues.serviceId ? 'selected' : '' %>>All Services</option>
-			<% offeredServices.forEach((service) => { %>
-				<option value="<%= service.service_id %>" <%= String(filterValues.serviceId || '') === String(service.service_id) ? 'selected' : '' %>><%= service.service_name %></option>
-			<% }) %>
-		</select>
+		<div style="display:grid; gap:0.35rem; min-width:200px; flex:1 1 280px; max-width:360px;">
+			<label for="serviceId">Filter Service</label>
+			<select id="serviceId" name="serviceId">
+				<option value="" <%= !filterValues.serviceId ? 'selected' : '' %>>All Services</option>
+				<% offeredServices.forEach((service) => { %>
+					<option value="<%= service.service_id %>" <%= String(filterValues.serviceId || '') === String(service.service_id) ? 'selected' : '' %>><%= service.service_name %></option>
+				<% }) %>
+			</select>
+		</div>
 
-		<div>
+		<div style="display:flex; gap:0.5rem; align-items:center;">
 			<button type="submit" class="btn btn-primary">Apply</button>
 			<a href="/services" class="btn">Reset</a>
 		</div>
@@ -66,7 +72,7 @@
 </section>
 
 <section class="card glass-panel">
-	<h2>Your Service Requests</h2>
+	<h2><%= managerMode ? 'All Service Requests' : 'Your Service Requests' %></h2>
 	<% const requests = Array.isArray(serviceRequests) ? serviceRequests : []; %>
 	<% if (requests.length > 0) { %>
 		<table style="width:100%; border-collapse: collapse;">
@@ -84,7 +90,7 @@
 				<% requests.forEach((request) => { %>
 					<tr>
 						<td style="padding: 0.5rem;"><%= request.serviceName || request.serviceType || 'General Service' %></td>
-						<td style="padding: 0.5rem;"><%= request.displayStatus || request.serviceStatus || 'Open' %></td>
+						<td style="padding: 0.5rem;"><%= request.serviceStatus || 'Submitted' %></td>
 						<td style="padding: 0.5rem;"><%= [request.invYear, request.invMake, request.invModel].filter(Boolean).join(' ') || 'Not specified' %></td>
 						<td style="padding: 0.5rem;"><%= request.requestNotes || 'No notes yet' %></td>
 						<td style="padding: 0.5rem;"><%= request.updatedAt ? new Date(request.updatedAt).toLocaleDateString() : (request.createdAt ? new Date(request.createdAt).toLocaleDateString() : 'N/A') %></td>

@@ -1,18 +1,23 @@
 <%- include('../partials/header') %>
 
+<a href="/services" class="btn" style="margin-bottom: 0.75rem;">Back to Services</a>
 <section class="card glass-panel">
 	<h1>Update Service Request</h1>
-	<p>Manage request progress and add notes for the customer.</p>
+	<p>Add notes to your request and delete it if needed.</p>
 </section>
 
 <section class="card glass-panel">
 	<form action="/services/<%= request && request.requestId ? request.requestId : '' %>/edit" method="POST">
-		<label for="service_status">Status</label>
-		<select id="service_status" name="service_status" required>
-			<option value="Open" <%= request && (request.displayStatus === 'Open' || request.serviceStatus === 'Submitted') ? 'selected' : '' %>>Open</option>
-			<option value="In Progress" <%= request && request.serviceStatus === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-			<option value="Completed" <%= request && request.serviceStatus === 'Completed' ? 'selected' : '' %>>Completed</option>
-		</select>
+		<% if (managerMode) { %>
+			<label for="service_status">Status</label>
+			<select id="service_status" name="service_status">
+				<option value="Submitted" <%= request && request.serviceStatus === 'Submitted' ? 'selected' : '' %>>Submitted</option>
+				<option value="In Progress" <%= request && request.serviceStatus === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+				<option value="Completed" <%= request && request.serviceStatus === 'Completed' ? 'selected' : '' %>>Completed</option>
+			</select>
+		<% } else { %>
+			<p><strong>Status:</strong> <%= request && request.serviceStatus ? request.serviceStatus : 'Submitted' %></p>
+		<% } %>
 
 		<label for="request_notes">Service Notes</label>
 		<textarea
@@ -24,7 +29,7 @@
 		><%= request && request.requestNotes ? request.requestNotes : '' %></textarea>
 
 		<button type="submit" class="btn btn-primary">Save Update</button>
-		<a href="/services" class="btn">Back to Services</a>
+		<button type="submit" formaction="/services/<%= request && request.requestId ? request.requestId : '' %>/delete" formmethod="POST" class="btn">Delete Request</button>
 	</form>
 </section>
 

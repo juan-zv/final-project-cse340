@@ -26,17 +26,24 @@ const createContactForm = async (senderName, senderEmail, messageBody) => {
 const getAllContactForms = async () => {
     const query = `
         SELECT
-            message_id AS id,
-            sender_name AS senderName,
-            sender_email AS senderEmail,
-            message_body AS message,
-            is_read AS isRead,
-            created_at AS submitted
+            message_id AS "id",
+            sender_name AS "senderName",
+            sender_email AS "senderEmail",
+            message_body AS "message",
+            is_read AS "isRead",
+            created_at AS "submitted"
         FROM contact_messages
         ORDER BY created_at DESC
     `;
     const result = await db.query(query);
-    return result.rows;
+    return result.rows.map((row) => ({
+        id: row.id,
+        senderName: row.senderName ?? row.sendername ?? row.sender_name ?? null,
+        senderEmail: row.senderEmail ?? row.senderemail ?? row.sender_email ?? null,
+        message: row.message ?? row.message_body ?? null,
+        isRead: row.isRead ?? row.isread ?? row.is_read ?? false,
+        submitted: row.submitted ?? row.created_at ?? null
+    }));
 };
 
 export { createContactForm, getAllContactForms };

@@ -119,6 +119,36 @@ const getAllVehiclesForAdmin = async () => {
     return result.rows;
 };
 
+const getVehicleForAdminById = async (invId) => {
+    const numericId = Number(invId);
+    if (!Number.isInteger(numericId) || numericId < 1) {
+        return null;
+    }
+
+    const query = `
+        SELECT
+            i.inv_id,
+            i.inv_make,
+            i.inv_model,
+            i.inv_year,
+            i.inv_description,
+            i.inv_image,
+            i.inv_thumbnail,
+            i.inv_price,
+            i.inv_miles,
+            i.is_available,
+            i.category_id,
+            c.category_name
+        FROM inventory i
+        JOIN categories c ON c.category_id = i.category_id
+        WHERE i.inv_id = $1
+        LIMIT 1
+    `;
+
+    const result = await db.query(query, [numericId]);
+    return result.rows[0] || null;
+};
+
 const createVehicle = async (vehicle) => {
     const query = `
         INSERT INTO inventory (
@@ -366,6 +396,7 @@ export {
     createService,
     deleteService,
     getAllVehiclesForAdmin,
+    getVehicleForAdminById,
     createVehicle,
     updateVehicle,
     updateVehicleEmployeeDetails,

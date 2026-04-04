@@ -1,0 +1,81 @@
+<%- include('../partials/header') %>
+
+<% const v = typeof vehicle !== 'undefined' ? vehicle : {}; %>
+<% const av = typeof adminVehicle !== 'undefined' && adminVehicle ? adminVehicle : null; %>
+<% const categoryItems = Array.isArray(categories) ? categories : []; %>
+
+<section class="card glass-panel">
+	<a href="/catalog/<%= v.slug || ('vehicle-' + (v.id || '')) %>" class="btn" style="margin-bottom: 0.75rem;">Back to Vehicle</a>
+	<h1>Edit Vehicle</h1>
+	<p><%= v.year || '' %> <%= v.make || '' %> <%= v.model || '' %></p>
+</section>
+
+<section class="card glass-panel">
+	<form action="/catalog/<%= v.slug || ('vehicle-' + (v.id || '')) %>/edit" method="POST" style="display:grid; gap:0.5rem;">
+		<% if (isAdmin) { %>
+			<label for="inv_make">Make</label>
+			<input id="inv_make" name="inv_make" type="text" value="<%= av ? av.inv_make : (v.make || '') %>" required>
+
+			<label for="inv_model">Model</label>
+			<input id="inv_model" name="inv_model" type="text" value="<%= av ? av.inv_model : (v.model || '') %>" required>
+
+			<label for="inv_year">Year</label>
+			<input id="inv_year" name="inv_year" type="text" value="<%= av ? av.inv_year : (v.year || '') %>" required>
+
+			<label for="inv_description">Description</label>
+			<textarea id="inv_description" name="inv_description" required><%= av ? av.inv_description : (v.description || '') %></textarea>
+
+			<label for="inv_image">Primary Image Path</label>
+			<input id="inv_image" name="inv_image" type="text" value="<%= av ? av.inv_image : (v.image || '') %>" required>
+
+			<label for="inv_thumbnail">Thumbnail Path</label>
+			<input id="inv_thumbnail" name="inv_thumbnail" type="text" value="<%= av ? av.inv_thumbnail : (v.thumbnail || '') %>" required>
+
+			<label for="vehicle_images">All Image Paths</label>
+			<textarea id="vehicle_images" name="vehicle_images" placeholder="Vehicle image paths, one per line or comma-separated"><%= existingImagePaths || '' %></textarea>
+
+			<label for="inv_price">Price</label>
+			<input id="inv_price" name="inv_price" type="number" min="0" step="0.01" value="<%= av ? av.inv_price : (v.price || '') %>" required>
+
+			<label for="inv_miles">Miles</label>
+			<input id="inv_miles" name="inv_miles" type="number" min="0" step="1" value="<%= av ? av.inv_miles : (v.miles || '') %>" required>
+
+			<label for="category_id">Category</label>
+			<select id="category_id" name="category_id" required>
+				<option value="">Select category</option>
+				<% categoryItems.forEach((category) => { %>
+					<option value="<%= category.category_id %>" <%= av && Number(av.category_id) === Number(category.category_id) ? 'selected' : '' %>>
+						<%= category.category_name %>
+					</option>
+				<% }) %>
+			</select>
+
+			<label for="is_available">Availability</label>
+			<select id="is_available" name="is_available" required>
+				<option value="true" <%= av && av.is_available ? 'selected' : '' %>>Available</option>
+				<option value="false" <%= av && !av.is_available ? 'selected' : '' %>>Unavailable</option>
+			</select>
+		<% } else { %>
+			<p><strong>Editable fields:</strong> Description, Price, Availability</p>
+
+			<label for="inv_description">Description</label>
+			<textarea id="inv_description" name="inv_description" required><%= av ? av.inv_description : (v.description || '') %></textarea>
+
+			<label for="inv_price">Price</label>
+			<input id="inv_price" name="inv_price" type="number" min="0" step="0.01" value="<%= av ? av.inv_price : (v.price || '') %>" required>
+
+			<label for="is_available">Availability</label>
+			<select id="is_available" name="is_available" required>
+				<option value="true" <%= av && av.is_available ? 'selected' : '' %>>Available</option>
+				<option value="false" <%= av && !av.is_available ? 'selected' : '' %>>Unavailable</option>
+			</select>
+		<% } %>
+
+		<div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+			<button type="submit" class="btn btn-primary">Save Vehicle</button>
+			<a href="/catalog/<%= v.slug || ('vehicle-' + (v.id || '')) %>" class="btn">Cancel</a>
+		</div>
+	</form>
+</section>
+
+<%- include('../partials/footer') %>

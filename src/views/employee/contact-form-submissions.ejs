@@ -7,25 +7,31 @@
 
 <section class="card glass-panel">
 	<% const filterValues = (typeof filters !== 'undefined' && filters) ? filters : {}; %>
-	<form method="GET" action="/employee/contact-form-submissions" style="display:grid; gap:0.75rem;">
-		<label for="sortBy">Sort By</label>
-		<select id="sortBy" name="sortBy">
-			<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
-			<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
-			<option value="sender" <%= filterValues.sortBy === 'sender' ? 'selected' : '' %>>Sender</option>
-		</select>
+	<form method="GET" action="/employee/contact-form-submissions" style="display:flex; flex-wrap:wrap; gap:0.75rem 1rem; align-items:flex-end;">
+		<div style="display:grid; gap:0.35rem; min-width:170px; flex:0 1 210px;">
+			<label for="sortBy">Sort By</label>
+			<select id="sortBy" name="sortBy">
+				<option value="newest" <%= filterValues.sortBy === 'newest' ? 'selected' : '' %>>Newest</option>
+				<option value="oldest" <%= filterValues.sortBy === 'oldest' ? 'selected' : '' %>>Oldest</option>
+				<option value="sender" <%= filterValues.sortBy === 'sender' ? 'selected' : '' %>>Sender</option>
+			</select>
+		</div>
 
-		<label for="readStatus">Filter Status</label>
-		<select id="readStatus" name="readStatus">
-			<option value="" <%= !filterValues.readStatus ? 'selected' : '' %>>All</option>
-			<option value="open" <%= String(filterValues.readStatus || '').toLowerCase() === 'open' ? 'selected' : '' %>>Open</option>
-			<option value="read" <%= String(filterValues.readStatus || '').toLowerCase() === 'read' ? 'selected' : '' %>>Read</option>
-		</select>
+		<div style="display:grid; gap:0.35rem; min-width:170px; flex:0 1 210px;">
+			<label for="readStatus">Filter Status</label>
+			<select id="readStatus" name="readStatus">
+				<option value="" <%= !filterValues.readStatus ? 'selected' : '' %>>All</option>
+				<option value="open" <%= String(filterValues.readStatus || '').toLowerCase() === 'open' ? 'selected' : '' %>>Open</option>
+				<option value="read" <%= String(filterValues.readStatus || '').toLowerCase() === 'read' ? 'selected' : '' %>>Read</option>
+			</select>
+		</div>
 
-		<label for="q">Keyword</label>
-		<input id="q" name="q" type="text" value="<%= filterValues.q || '' %>" placeholder="Search sender, email, or message">
+		<div style="display:grid; gap:0.35rem; min-width:220px; flex:1 1 320px; max-width:420px;">
+			<label for="q">Keyword</label>
+			<input id="q" name="q" type="text" value="<%= filterValues.q || '' %>" placeholder="Search sender, email, or message">
+		</div>
 
-		<div>
+		<div style="display:flex; gap:0.5rem; align-items:center;">
 			<button type="submit" class="btn btn-primary">Apply</button>
 			<a href="/employee/contact-form-submissions" class="btn">Reset</a>
 		</div>
@@ -35,7 +41,9 @@
 <section class="card glass-panel">
 	<% const messages = Array.isArray(contactForms) ? contactForms : []; %>
 	<% const currentRole = user && (user.roleName || user.account_type || user.role); %>
-	<% const isAdminUser = currentRole === 'Admin'; %>
+	<% const isStaffUser = currentRole === 'Admin' || currentRole === 'Employee'; %>
+	<% const deleteBasePath = currentRole === 'Admin' ? '/admin/contact-messages' : '/employee/contact-messages'; %>
+	<% const returnToPath = currentRole === 'Admin' ? '/admin/contact-form-submissions' : '/employee/contact-form-submissions'; %>
 	<% if (messages.length > 0) { %>
 		<table style="width:100%; border-collapse: collapse;">
 			<thead>
@@ -45,7 +53,7 @@
 					<th style="text-align:left; padding: 0.5rem;">Email</th>
 					<th style="text-align:left; padding: 0.5rem;">Message</th>
 					<th style="text-align:left; padding: 0.5rem;">Submitted</th>
-					<% if (isAdminUser) { %>
+					<% if (isStaffUser) { %>
 						<th style="text-align:left; padding: 0.5rem;">Actions</th>
 					<% } %>
 				</tr>
@@ -54,14 +62,14 @@
 				<% messages.forEach((item) => { %>
 					<tr>
 						<td style="padding: 0.5rem;"><%= item.isRead ? 'Read' : 'Open' %></td>
-						<td style="padding: 0.5rem;"><%= item.senderName %></td>
-						<td style="padding: 0.5rem;"><%= item.senderEmail %></td>
+						<td style="padding: 0.5rem;"><%= item.senderName || 'Unknown Sender' %></td>
+						<td style="padding: 0.5rem;"><%= item.senderEmail || 'No email provided' %></td>
 						<td style="padding: 0.5rem;"><%= item.message %></td>
 						<td style="padding: 0.5rem;"><%= item.submitted ? new Date(item.submitted).toLocaleString() : 'N/A' %></td>
-						<% if (isAdminUser) { %>
+						<% if (isStaffUser) { %>
 							<td style="padding: 0.5rem;">
-								<form action="/admin/contact-messages/<%= item.id %>/delete" method="POST" style="display:inline-block;">
-									<input type="hidden" name="returnTo" value="/employee/contact-form-submissions">
+								<form action="<%= deleteBasePath %>/<%= item.id %>/delete" method="POST" style="display:inline-block;">
+									<input type="hidden" name="returnTo" value="<%= returnToPath %>">
 									<button type="submit" class="btn">Delete</button>
 								</form>
 							</td>

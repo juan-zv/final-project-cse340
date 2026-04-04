@@ -18,7 +18,7 @@
 </section>
 
 <section class="card glass-panel">
-	<h2>Vehicle Gallery</h2>
+	<h2>Photos</h2>
 	<% const primaryImage = images.length > 0 ? images[0] : null; %>
 	<% const secondaryImages = images.length > 1 ? images.slice(1) : []; %>
 	<div style="display:grid; gap: 1rem;">
@@ -38,7 +38,7 @@
 </section>
 
 <section class="card glass-panel">
-	<h2>Specifications and Pricing</h2>
+	<h2>Vehicle Details</h2>
 	<p><strong>Price:</strong> $<%= v.price || 'N/A' %></p>
 	<p><strong>Mileage:</strong> <%= v.miles || 'N/A' %></p>
 	<p><strong>Color:</strong> <%= v.color || 'N/A' %></p>
@@ -46,22 +46,25 @@
 </section>
 
 <section class="card glass-panel">
-	<h2>Admin Features</h2>
+	<h2>Actions</h2>
 	<% if (isLoggedIn) { %>
-		<p>Signed in users can leave reviews and submit service requests for their vehicles.</p>
+		<p>Signed in users can leave reviews for this vehicle.</p>
 		<a class="btn btn-primary" href="/reviews/new?inv_id=<%= v.id || '' %>">Leave a Review</a>
-		<a class="btn" href="/services/request?inv_id=<%= v.id || '' %>">Request Service</a>
-		<% if (role === 'Employee' || role === 'Admin') { %>
+		<% if (role === 'Admin') { %>
+			<a class="btn" href="/catalog/<%= v.slug || ('vehicle-' + (v.id || '')) %>/edit">Edit This Vehicle</a>
+			<a class="btn" href="/catalog/<%= v.slug || v.id || '' %>/images/new">Add Image</a>
+		<% } else if (role === 'Employee') { %>
+			<a class="btn" href="/catalog/<%= v.slug || ('vehicle-' + (v.id || '')) %>/edit">Edit This Vehicle</a>
 			<a class="btn" href="/catalog/<%= v.slug || v.id || '' %>/images/new">Add Image</a>
 		<% } %>
 	<% } else { %>
-		<p>Log in to leave a review, request service, and track your request history.</p>
-		<a class="btn btn-primary" href="/login">Log In to Continue</a>
+		<p>Log in to leave a review for this vehicle.</p>
+		<a class="btn btn-primary" href="/login">Log In to Leave a Review</a>
 	<% } %>
 </section>
 
 <section class="card glass-panel">
-	<h2>Reviews for This Vehicle</h2>
+	<h2>Customer Reviews</h2>
 	<% const vehicleReviews = Array.isArray(reviews) ? reviews : []; %>
 	<% if (vehicleReviews.length > 0) { %>
 		<% vehicleReviews.forEach((review) => { %>
