@@ -6,6 +6,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+if (!process.env.DB_URL && !process.env.DATABASE_URL && typeof process.loadEnvFile === 'function') {
+    try {
+        process.loadEnvFile(path.join(__dirname, '../../.env'));
+    } catch {
+        // Ignore missing .env and rely on environment variables when deployed.
+    }
+}
+
 const certPath = path.join(__dirname, '../../bin', 'byuicse-psql-cert.pem');
 const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath) : null;
 const connectionString = process.env.DB_URL || process.env.DATABASE_URL;
