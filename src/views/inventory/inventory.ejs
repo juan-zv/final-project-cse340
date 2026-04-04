@@ -46,18 +46,26 @@
 <div class="vehicle-grid">
 	<% if (typeof vehicles !== 'undefined' && vehicles.length > 0) { %>
 		<% vehicles.forEach(v => { %>
-			<div class="vehicle-card">
+			<article class="vehicle-card">
 				<img
 					src="<%= v.image %>"
 					alt="<%= `${v.year} ${v.make} ${v.model}` %>"
 					class="catalog-primary-thumb"
 					loading="lazy"
 				>
-				<h2><%= v.year %> <%= v.make %> <%= v.model %></h2>
-				<p class="status">Status: <%= v.status %></p>
-				<p><strong>$<%= v.price %></strong></p>
-				<a href="/catalog/<%= v.slug %>" class="btn">View Details</a>
-			</div>
+				<div class="vehicle-card-body">
+					<h2><%= v.year %> <%= v.make %> <%= v.model %></h2>
+					<p class="vehicle-card-meta">
+						<span class="status">Status: <%= v.status %></span>
+						<span><%= v.category %></span>
+					</p>
+					<p class="vehicle-card-price">$<%= Number(v.price).toLocaleString('en-US') %></p>
+					<p class="vehicle-card-description">
+						<%= v.description && v.description.length > 160 ? `${v.description.slice(0, 157)}...` : (v.description || 'No description provided.') %>
+					</p>
+					<a href="/catalog/<%= v.slug %>" class="btn">View Details</a>
+				</div>
+			</article>
 		<% }) %>
 	<% } else { %>
 		<p>No vehicles found matching your criteria.</p>

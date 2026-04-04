@@ -1,6 +1,7 @@
 import { createServiceRequest } from '../../models/services/index.js';
 import { getAllServiceRequests, getServiceRequestsByAccount } from '../../models/services/index.js';
 import { getServiceRequestById, updateServiceRequestStatus } from '../../models/services/index.js';
+import { getServiceCatalog } from '../../models/services/index.js';
 import { getInventory } from '../../models/inventory/index.js';
 import { validationResult } from 'express-validator';
 
@@ -17,12 +18,14 @@ export const buildServicesList = async (req, res, next) => {
 		const isManagerView = canManageAll(role);
 		const sortBy = String(req.query.sortBy || 'newest').toLowerCase();
 		const status = String(req.query.status || '').trim().toLowerCase();
-		const serviceType = String(req.query.serviceType || '').trim().toLowerCase();
-		const keyword = String(req.query.q || '').trim().toLowerCase();
+		const serviceId = Number.parseInt(String(req.query.serviceId || ''), 10);
 
-		const serviceRequests = canManageAll(role)
-			? await getAllServiceRequests()
-			: await getServiceRequestsByAccount(accountId);
+		const [serviceRequests, serviceOptions] = await Promise.all([
+			canManageAll(role)
+				? getAllServiceRequests()
+				: getServiceRequestsByAccount(accountId),
+			getServiceCatalog()
+		]);
 
 		const filteredRequests = serviceRequests
 			.map((request) => ({
@@ -31,18 +34,11 @@ export const buildServicesList = async (req, res, next) => {
 			}))
 			.filter((request) => {
 				const normalizedStatus = String(request.displayStatus || '').toLowerCase();
-				const normalizedType = String(request.serviceType || '').toLowerCase();
-				const vehicleName = [request.invYear, request.invMake, request.invModel].filter(Boolean).join(' ').toLowerCase();
-				const notes = String(request.requestNotes || '').toLowerCase();
-				const requester = `${request.accountFirstName || ''} ${request.accountLastName || ''}`.trim().toLowerCase();
 
 				if (status && normalizedStatus !== status) {
 					return false;
 				}
-				if (serviceType && !normalizedType.includes(serviceType)) {
-					return false;
-				}
-				if (keyword && !notes.includes(keyword) && !vehicleName.includes(keyword) && !requester.includes(keyword)) {
+				if (Number.isInteger(serviceId) && serviceId > 0 && request.serviceId !== serviceId) {
 					return false;
 				}
 				return true;
@@ -65,11 +61,11 @@ export const buildServicesList = async (req, res, next) => {
 		res.render('services/services', {
 			title: 'Services',
 			serviceRequests: filteredRequests,
+			serviceOptions,
 			filters: {
 				sortBy,
 				status: String(req.query.status || ''),
-				serviceType: String(req.query.serviceType || ''),
-				q: String(req.query.q || '')
+				serviceId: String(req.query.serviceId || '')
 			},
 			isManagerView
 		});
@@ -81,7 +77,10 @@ export const buildServicesList = async (req, res, next) => {
 export const buildServiceRequest = async (req, res, next) => {
 	try {
 		const invId = String(req.query.inv_id || '');
-		const vehicles = await getInventory('', 'newest');
+		const [vehicles, serviceOptions] = await Promise.all([
+			getInventory('', 'newest'),
+			getServiceCatalog()
+		]);
 		const vehicleOptions = vehicles.map((vehicle) => ({
 			id: String(vehicle.id),
 			name: `${vehicle.year} ${vehicle.make} ${vehicle.model}`
@@ -90,7 +89,8 @@ export const buildServiceRequest = async (req, res, next) => {
 		res.render('services/request', {
 			title: 'Request Service',
 			inv_id: invId,
-			vehicleOptions
+			vehicleOptions,
+			serviceOptions
 		});
 	} catch (error) {
 		next(error);
@@ -100,7 +100,7 @@ export const buildServiceRequest = async (req, res, next) => {
 export const submitServiceRequest = async (req, res, next) => {
 	try {
 		const errors = validationResult(req);
-		const { inv_id, service_type, request_notes } = req.body;
+		const { inv_id, service_id, request_notes } = req.body;
 		if (!errors.isEmpty()) {
 			errors.array().forEach((error) => req.flash('error', error.msg));
 			const nextUrl = inv_id ? `/services/request?inv_id=${encodeURIComponent(inv_id)}` : '/services/request';
@@ -109,9 +109,10 @@ export const submitServiceRequest = async (req, res, next) => {
 
 		const accountId = getSessionUserId(req);
 		const numericInvId = inv_id ? Number.parseInt(inv_id, 10) : null;
+		const numericServiceId = Number.parseInt(service_id, 10);
 
 		await createServiceRequest(
-			service_type,
+			numericServiceId,
 			request_notes,
 			accountId,
 			Number.isNaN(numericInvId) ? null : numericInvId

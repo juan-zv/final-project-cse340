@@ -7,13 +7,27 @@
 
 <section class="card glass-panel">
 	<h2>Available Services</h2>
-	<ul style="padding-left: 1.2rem;">
-		<li>Oil change and filter replacement</li>
-		<li>Vehicle inspection and diagnostics</li>
-		<li>Brake system check and repair</li>
-		<li>Tire rotation and alignment</li>
-		<li>General maintenance and follow-up support</li>
-	</ul>
+	<% const offeredServices = Array.isArray(serviceOptions) ? serviceOptions : []; %>
+	<% if (offeredServices.length > 0) { %>
+		<table style="width:100%; border-collapse: collapse;">
+			<thead>
+				<tr>
+					<th style="text-align:left; padding: 0.5rem;">Service</th>
+					<th style="text-align:left; padding: 0.5rem;">Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% offeredServices.forEach((service) => { %>
+					<tr>
+						<td style="padding: 0.5rem;"><%= service.service_name %></td>
+						<td style="padding: 0.5rem;"><%= service.service_description || 'No description provided' %></td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+	<% } else { %>
+		<p>No services are currently configured.</p>
+	<% } %>
 	<a href="/services/request" class="btn btn-primary">Start Service Request</a>
 </section>
 
@@ -36,11 +50,13 @@
 			<option value="completed" <%= String(filterValues.status || '').toLowerCase() === 'completed' ? 'selected' : '' %>>Completed</option>
 		</select>
 
-		<label for="serviceType">Filter Service Type</label>
-		<input id="serviceType" name="serviceType" type="text" value="<%= filterValues.serviceType || '' %>" placeholder="Oil, brake, tire, etc.">
-
-		<label for="q">Keyword</label>
-		<input id="q" name="q" type="text" value="<%= filterValues.q || '' %>" placeholder="Search notes, vehicle, or requester">
+		<label for="serviceId">Filter Service</label>
+		<select id="serviceId" name="serviceId">
+			<option value="" <%= !filterValues.serviceId ? 'selected' : '' %>>All Services</option>
+			<% offeredServices.forEach((service) => { %>
+				<option value="<%= service.service_id %>" <%= String(filterValues.serviceId || '') === String(service.service_id) ? 'selected' : '' %>><%= service.service_name %></option>
+			<% }) %>
+		</select>
 
 		<div>
 			<button type="submit" class="btn btn-primary">Apply</button>
@@ -67,7 +83,7 @@
 			<tbody>
 				<% requests.forEach((request) => { %>
 					<tr>
-						<td style="padding: 0.5rem;"><%= request.serviceType || 'General Service' %></td>
+						<td style="padding: 0.5rem;"><%= request.serviceName || request.serviceType || 'General Service' %></td>
 						<td style="padding: 0.5rem;"><%= request.displayStatus || request.serviceStatus || 'Open' %></td>
 						<td style="padding: 0.5rem;"><%= [request.invYear, request.invMake, request.invModel].filter(Boolean).join(' ') || 'Not specified' %></td>
 						<td style="padding: 0.5rem;"><%= request.requestNotes || 'No notes yet' %></td>

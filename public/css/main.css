@@ -257,6 +257,16 @@ footer {
 }
 
 @media (max-width: 820px) {
+    header,
+    main,
+    footer {
+        width: min(1120px, 92vw);
+    }
+
+    header nav {
+        padding-inline: 1rem;
+    }
+
     header nav {
         align-items: center;
         flex-wrap: wrap;

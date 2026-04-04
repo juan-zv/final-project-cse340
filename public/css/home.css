@@ -81,17 +81,46 @@
 
 .category-card {
     display: grid;
-    place-content: center;
-    min-height: 90px;
+    min-height: 130px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 12px;
     background: rgba(17, 25, 40, 0.35);
     transition: transform 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+    position: relative;
 }
 
 .category-card:hover {
     transform: translateY(-2px);
     border-color: rgba(29, 180, 137, 0.7);
+}
+
+.category-card-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+    filter: saturate(1.05);
+}
+
+.category-card h3 {
+    margin: 0;
+    padding: 0.7rem 0.8rem 0.85rem;
+    line-height: 1.2;
+}
+
+.category-card.has-image h3 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: #ffffff;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.05));
+    padding: 1.2rem 0.8rem 0.7rem;
+}
+
+.category-card.no-image {
+    place-content: center;
 }
 
 .vehicle-grid {
@@ -138,8 +167,9 @@
 
 @media (max-width: 640px) {
     .home-container {
-        width: min(1120px, 94vw);
+        width: min(1120px, 92vw);
         padding-top: 1rem;
+        padding-inline: 0.25rem;
     }
 
     .hero,

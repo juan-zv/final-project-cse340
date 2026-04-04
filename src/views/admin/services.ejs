@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<section class="card glass-panel">
+	<h1>Service Catalog Management</h1>
+	<p>Add or remove service offerings that can be selected in service requests.</p>
+</section>
+
+<section class="card glass-panel">
+	<h2>Add Service</h2>
+	<form action="/admin/services" method="POST" style="display:grid; gap:0.75rem;">
+		<label for="service_name">Service Name</label>
+		<input id="service_name" name="service_name" type="text" maxlength="100" required placeholder="e.g. Battery Replacement">
+
+		<label for="service_description">Description (optional)</label>
+		<textarea id="service_description" name="service_description" rows="3" maxlength="1000" placeholder="Describe what this service includes"></textarea>
+
+		<button type="submit" class="btn btn-primary">Add Service</button>
+	</form>
+</section>
+
+<section class="card glass-panel">
+	<h2>Existing Services</h2>
+	<% const serviceItems = Array.isArray(services) ? services : []; %>
+	<% if (serviceItems.length > 0) { %>
+		<table style="width:100%; border-collapse: collapse;">
+			<thead>
+				<tr>
+					<th style="text-align:left; padding: 0.5rem;">ID</th>
+					<th style="text-align:left; padding: 0.5rem;">Name</th>
+					<th style="text-align:left; padding: 0.5rem;">Description</th>
+					<th style="text-align:left; padding: 0.5rem;">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% serviceItems.forEach((service) => { %>
+					<tr>
+						<td style="padding: 0.5rem;"><%= service.service_id %></td>
+						<td style="padding: 0.5rem;"><%= service.service_name %></td>
+						<td style="padding: 0.5rem;"><%= service.service_description || 'No description provided' %></td>
+						<td style="padding: 0.5rem;">
+							<form action="/admin/services/<%= service.service_id %>/delete" method="POST" style="display:inline;">
+								<button type="submit" class="btn">Delete</button>
+							</form>
+						</td>
+					</tr>
+				<% }) %>
+			</tbody>
+		</table>
+	<% } else { %>
+		<p>No services found.</p>
+	<% } %>
+</section>
+
+<%- include('../partials/footer') %>

@@ -62,6 +62,39 @@ const deleteCategory = async (categoryId) => {
     return result.rows[0] || null;
 };
 
+const getAllServices = async () => {
+    const query = `
+        SELECT service_id, service_name, service_description, created_at
+        FROM services
+        ORDER BY service_name ASC
+    `;
+
+    const result = await db.query(query);
+    return result.rows;
+};
+
+const createService = async (serviceName, serviceDescription = '') => {
+    const query = `
+        INSERT INTO services (service_name, service_description)
+        VALUES ($1, NULLIF($2, ''))
+        RETURNING service_id, service_name, service_description, created_at
+    `;
+
+    const result = await db.query(query, [serviceName, serviceDescription]);
+    return result.rows[0] || null;
+};
+
+const deleteService = async (serviceId) => {
+    const query = `
+        DELETE FROM services
+        WHERE service_id = $1
+        RETURNING service_id
+    `;
+
+    const result = await db.query(query, [serviceId]);
+    return result.rows[0] || null;
+};
+
 const getAllVehiclesForAdmin = async () => {
     const query = `
         SELECT
@@ -239,13 +272,14 @@ const getSystemActivity = async () => {
     const recentServicesQuery = `
         SELECT
             s.request_id,
-            s.service_type,
+            sv.service_name,
             s.service_status,
             s.created_at,
             a.account_firstname,
             a.account_lastname
         FROM service_requests s
         JOIN accounts a ON a.account_id = s.account_id
+        JOIN services sv ON sv.service_id = s.service_id
         ORDER BY s.created_at DESC
         LIMIT 10
     `;
@@ -328,6 +362,9 @@ export {
     createCategory,
     updateCategory,
     deleteCategory,
+    getAllServices,
+    createService,
+    deleteService,
     getAllVehiclesForAdmin,
     createVehicle,
     updateVehicle,

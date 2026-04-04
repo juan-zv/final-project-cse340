@@ -3,6 +3,7 @@ BEGIN;
 
 -- Drop existing tables
 DROP TABLE IF EXISTS service_requests CASCADE;
+DROP TABLE IF EXISTS services CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS contact_messages CASCADE;
 DROP TABLE IF EXISTS vehicle_images CASCADE;
@@ -75,16 +76,25 @@ CREATE TABLE reviews (
     CONSTRAINT fk_review_account FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
 );
 
+-- Create services catalog table
+CREATE TABLE services (
+    service_id SERIAL PRIMARY KEY,
+    service_name VARCHAR(100) UNIQUE NOT NULL,
+    service_description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create service requests table
 CREATE TABLE service_requests (
     request_id SERIAL PRIMARY KEY,
-    service_type VARCHAR(100) NOT NULL,
+    service_id INTEGER NOT NULL,
     service_status service_status DEFAULT 'Submitted',
     request_notes TEXT,
     account_id INTEGER NOT NULL,
     inv_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_service_account FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE
+    CONSTRAINT fk_service_account FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
+    CONSTRAINT fk_service_catalog FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE RESTRICT
 );
 
 -- Create contact messages table
@@ -109,6 +119,14 @@ INSERT INTO accounts (account_firstname, account_lastname, account_email, accoun
     ('Admin', 'Account', 'admin@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Admin'),
     ('Employee', 'Account', 'employee@exampl.ecom', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Employee'),
     ('User', 'Account', 'user@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'User');
+
+-- Seed service offerings
+INSERT INTO services (service_name, service_description) VALUES
+    ('Oil Change', 'Oil and filter replacement based on manufacturer recommendations.'),
+    ('Inspection', 'Multi-point inspection and diagnostics for your vehicle.'),
+    ('Brake Service', 'Brake pad, rotor, fluid checks, and recommended brake repairs.'),
+    ('Tire Service', 'Tire rotation, balancing, pressure checks, and alignment recommendations.'),
+    ('General Maintenance', 'General preventive maintenance and follow-up support.');
 
 -- Seed inventory (3 per category)
 INSERT INTO inventory (

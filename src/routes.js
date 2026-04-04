@@ -24,9 +24,12 @@ import {
     buildAdminDashboard,
     buildEmployeesList,
     buildCategoriesManagement,
+    buildServicesManagement,
     createCategoryAction,
+    createServiceAction,
     updateCategoryAction,
     deleteCategoryAction,
+    deleteServiceAction,
     buildInventoryManagement,
     createVehicleAction,
     updateVehicleAction,
@@ -111,6 +114,9 @@ router.get('/admin/categories', requireAdmin, buildCategoriesManagement);
 router.post('/admin/categories', requireAdmin, createCategoryAction);
 router.post('/admin/categories/:categoryId/edit', requireAdmin, updateCategoryAction);
 router.post('/admin/categories/:categoryId/delete', requireAdmin, deleteCategoryAction);
+router.get('/admin/services', requireAdmin, buildServicesManagement);
+router.post('/admin/services', requireAdmin, createServiceAction);
+router.post('/admin/services/:serviceId/delete', requireAdmin, deleteServiceAction);
 router.get('/admin/inventory', requireAdmin, buildInventoryManagement);
 router.post('/admin/inventory', requireAdmin, createVehicleAction);
 router.post('/admin/inventory/:invId/edit', requireAdmin, updateVehicleAction);

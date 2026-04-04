@@ -2,7 +2,9 @@ import db from '../db.js';
 
 const mapServiceRequest = (row) => ({
     requestId: row.request_id,
-    serviceType: row.service_type,
+    serviceId: row.service_id,
+    serviceName: row.service_name || row.service_type,
+    serviceType: row.service_name || row.service_type,
     serviceStatus: row.service_status,
     requestNotes: row.request_notes,
     accountId: row.account_id,
@@ -21,9 +23,11 @@ const getAllServiceRequests = async () => {
     const query = `
         SELECT
             s.*, a.account_firstname, a.account_lastname, a.account_email,
-            i.inv_make, i.inv_model, i.inv_year
+            i.inv_make, i.inv_model, i.inv_year,
+            sv.service_name
         FROM service_requests s
         JOIN accounts a ON s.account_id = a.account_id
+        JOIN services sv ON s.service_id = sv.service_id
         LEFT JOIN inventory i ON s.inv_id = i.inv_id
         ORDER BY s.created_at DESC
     `;
@@ -35,8 +39,10 @@ const getAllServiceRequests = async () => {
 const getServiceRequestsByAccount = async (accountId) => {
     const query = `
         SELECT
-            s.*, i.inv_make, i.inv_model, i.inv_year
+            s.*, i.inv_make, i.inv_model, i.inv_year,
+            sv.service_name
         FROM service_requests s
+        JOIN services sv ON s.service_id = sv.service_id
         LEFT JOIN inventory i ON s.inv_id = i.inv_id
         WHERE s.account_id = $1
         ORDER BY s.created_at DESC
@@ -50,9 +56,11 @@ const getServiceRequestById = async (requestId) => {
     const query = `
         SELECT
             s.*, a.account_firstname, a.account_lastname, a.account_email,
-            i.inv_make, i.inv_model, i.inv_year
+            i.inv_make, i.inv_model, i.inv_year,
+            sv.service_name
         FROM service_requests s
         JOIN accounts a ON s.account_id = a.account_id
+        JOIN services sv ON s.service_id = sv.service_id
         LEFT JOIN inventory i ON s.inv_id = i.inv_id
         WHERE s.request_id = $1
     `;
@@ -61,15 +69,15 @@ const getServiceRequestById = async (requestId) => {
     return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
 };
 
-const createServiceRequest = async (serviceType, requestNotes, accountId, invId = null) => {
+const createServiceRequest = async (serviceId, requestNotes, accountId, invId = null) => {
     const query = `
-        INSERT INTO service_requests (service_type, request_notes, account_id, inv_id)
+        INSERT INTO service_requests (service_id, request_notes, account_id, inv_id)
         VALUES ($1, $2, $3, $4)
-        RETURNING *
+        RETURNING request_id
     `;
 
-    const result = await db.query(query, [serviceType, requestNotes, accountId, invId]);
-    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
+    const result = await db.query(query, [serviceId, requestNotes, accountId, invId]);
+    return result.rows[0] ? getServiceRequestById(result.rows[0].request_id) : {};
 };
 
 const updateServiceRequestStatus = async (requestId, status, notes = null) => {
@@ -78,22 +86,55 @@ const updateServiceRequestStatus = async (requestId, status, notes = null) => {
         SET service_status = $1,
             request_notes = COALESCE($2, request_notes)
         WHERE request_id = $3
-        RETURNING *
+        RETURNING request_id
     `;
 
     const result = await db.query(query, [status, notes, requestId]);
-    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
+    return result.rows[0] ? getServiceRequestById(result.rows[0].request_id) : {};
 };
 
 const deleteServiceRequest = async (requestId) => {
     const query = `
         DELETE FROM service_requests
         WHERE request_id = $1
-        RETURNING *
+        RETURNING request_id
     `;
 
     const result = await db.query(query, [requestId]);
-    return result.rows[0] ? mapServiceRequest(result.rows[0]) : {};
+    return result.rows[0] ? { requestId: result.rows[0].request_id } : {};
+};
+
+const getServiceCatalog = async () => {
+    const query = `
+        SELECT service_id, service_name, service_description, created_at
+        FROM services
+        ORDER BY service_name ASC
+    `;
+
+    const result = await db.query(query);
+    return result.rows;
+};
+
+const createServiceCatalogItem = async (serviceName, serviceDescription = '') => {
+    const query = `
+        INSERT INTO services (service_name, service_description)
+        VALUES ($1, NULLIF($2, ''))
+        RETURNING service_id, service_name, service_description, created_at
+    `;
+
+    const result = await db.query(query, [serviceName, serviceDescription]);
+    return result.rows[0] || null;
+};
+
+const deleteServiceCatalogItem = async (serviceId) => {
+    const query = `
+        DELETE FROM services
+        WHERE service_id = $1
+        RETURNING service_id
+    `;
+
+    const result = await db.query(query, [serviceId]);
+    return result.rows[0] || null;
 };
 
 export {
@@ -102,5 +143,8 @@ export {
     getServiceRequestById,
     createServiceRequest,
     updateServiceRequestStatus,
-    deleteServiceRequest
+    deleteServiceRequest,
+    getServiceCatalog,
+    createServiceCatalogItem,
+    deleteServiceCatalogItem
 };

@@ -1,4 +1,5 @@
 import { getInventory } from '../models/inventory/index.js';
+import { getAllCategories } from '../models/admin/index.js';
 
 // Route handlers for static pages
 const homePage = async (req, res, next) => {
@@ -7,12 +8,35 @@ const homePage = async (req, res, next) => {
     }
 
     try {
-        const inventory = await getInventory('', 'newest');
+        const [inventory, categories] = await Promise.all([
+            getInventory('', 'newest'),
+            getAllCategories()
+        ]);
         const featuredVehicles = inventory.slice(0, 3);
+
+        const representativeByCategory = inventory.reduce((map, vehicle) => {
+            if (!vehicle.category || map.has(vehicle.category)) {
+                return map;
+            }
+
+            map.set(vehicle.category, vehicle);
+            return map;
+        }, new Map());
+
+        const browseCategories = categories.map((category) => {
+            const name = category.category_name;
+            const vehicle = representativeByCategory.get(name);
+            return {
+                name,
+                href: `/catalog?category=${encodeURIComponent(name)}`,
+                image: vehicle ? (vehicle.thumbnail || vehicle.image || '') : ''
+            };
+        });
 
         res.render('home', {
             title: 'Home',
-            featuredVehicles
+            featuredVehicles,
+            browseCategories
         });
     } catch (error) {
         next(error);

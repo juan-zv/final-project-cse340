@@ -88,7 +88,8 @@
     }
 
     .login-container {
-        width: min(1120px, 94vw);
+        width: min(1120px, 92vw);
         padding-top: 1rem;
+        padding-inline: 0.25rem;
     }
 }

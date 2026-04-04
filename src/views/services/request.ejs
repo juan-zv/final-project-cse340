@@ -9,6 +9,7 @@
 	<form action="/services/request" method="POST">
 		<% const selectedInvId = typeof inv_id !== 'undefined' ? inv_id : ''; %>
 		<% const allVehicles = Array.isArray(vehicleOptions) ? vehicleOptions : []; %>
+		<% const allServices = Array.isArray(serviceOptions) ? serviceOptions : []; %>
 
 		<label for="inv_id">Vehicle</label>
 		<select id="inv_id" name="inv_id" required>
@@ -20,14 +21,12 @@
 			<% }) %>
 		</select>
 
-		<label for="service_type">Service Type</label>
-		<select id="service_type" name="service_type" required>
+		<label for="service_id">Service Type</label>
+		<select id="service_id" name="service_id" required>
 			<option value="">Select a service</option>
-			<option value="Oil Change">Oil Change</option>
-			<option value="Inspection">Inspection</option>
-			<option value="Brake Service">Brake Service</option>
-			<option value="Tire Service">Tire Service</option>
-			<option value="General Maintenance">General Maintenance</option>
+			<% allServices.forEach((service) => { %>
+				<option value="<%= service.service_id %>"><%= service.service_name %></option>
+			<% }) %>
 		</select>
 
 		<label for="request_notes">Request Notes</label>

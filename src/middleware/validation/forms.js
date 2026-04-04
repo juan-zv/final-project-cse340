@@ -113,10 +113,12 @@ const serviceRequestValidation = [
         .withMessage('Please select a vehicle')
         .isInt({ min: 1 })
         .withMessage('Vehicle ID must be a valid number'),
-    body('service_type')
+    body('service_id')
         .trim()
-        .isLength({ min: 2, max: 120 })
-        .withMessage('Service type must be between 2 and 120 characters'),
+        .notEmpty()
+        .withMessage('Please select a service')
+        .isInt({ min: 1 })
+        .withMessage('Service must be a valid option'),
     body('request_notes')
         .trim()
         .isLength({ min: 10, max: 2000 })

@@ -197,12 +197,117 @@ const syncSampleVehicleImages = async () => {
 };
 
 /**
+ * Ensures the services catalog table exists and that service_requests references it via service_id.
+ */
+const ensureServicesSchema = async () => {
+    const serviceRequestsTableCheck = await db.query(
+        "SELECT to_regclass('public.service_requests') IS NOT NULL AS table_exists"
+    );
+
+    if (!serviceRequestsTableCheck.rows[0]?.table_exists) {
+        return;
+    }
+
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS services (
+            service_id SERIAL PRIMARY KEY,
+            service_name VARCHAR(100) UNIQUE NOT NULL,
+            service_description TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    await db.query(`
+        INSERT INTO services (service_name, service_description)
+        VALUES
+            ('Oil Change', 'Oil and filter replacement based on manufacturer recommendations.'),
+            ('Inspection', 'Multi-point inspection and diagnostics for your vehicle.'),
+            ('Brake Service', 'Brake pad, rotor, fluid checks, and recommended brake repairs.'),
+            ('Tire Service', 'Tire rotation, balancing, pressure checks, and alignment recommendations.'),
+            ('General Maintenance', 'General preventive maintenance and follow-up support.')
+        ON CONFLICT (service_name) DO NOTHING
+    `);
+
+    const serviceIdColumnCheck = await db.query(`
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'service_requests'
+              AND column_name = 'service_id'
+        ) AS column_exists
+    `);
+
+    if (!serviceIdColumnCheck.rows[0]?.column_exists) {
+        await db.query('ALTER TABLE service_requests ADD COLUMN service_id INTEGER');
+
+        const serviceTypeColumnCheck = await db.query(`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = 'service_requests'
+                  AND column_name = 'service_type'
+            ) AS column_exists
+        `);
+
+        if (serviceTypeColumnCheck.rows[0]?.column_exists) {
+            await db.query(`
+                INSERT INTO services (service_name)
+                SELECT DISTINCT COALESCE(NULLIF(TRIM(service_type), ''), 'General Maintenance')
+                FROM service_requests
+                ON CONFLICT (service_name) DO NOTHING
+            `);
+
+            await db.query(`
+                UPDATE service_requests sr
+                SET service_id = s.service_id
+                FROM services s
+                WHERE LOWER(s.service_name) = LOWER(COALESCE(NULLIF(TRIM(sr.service_type), ''), 'General Maintenance'))
+                  AND sr.service_id IS NULL
+            `);
+        }
+
+        await db.query(`
+            UPDATE service_requests
+            SET service_id = (
+                SELECT service_id
+                FROM services
+                WHERE service_name = 'General Maintenance'
+                LIMIT 1
+            )
+            WHERE service_id IS NULL
+        `);
+    }
+
+    await db.query('ALTER TABLE service_requests ALTER COLUMN service_id SET NOT NULL');
+
+    await db.query(`
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'fk_service_catalog'
+            ) THEN
+                ALTER TABLE service_requests
+                ADD CONSTRAINT fk_service_catalog
+                FOREIGN KEY (service_id)
+                REFERENCES services(service_id)
+                ON DELETE RESTRICT;
+            END IF;
+        END$$;
+    `);
+};
+
+/**
  * Sets up the database by running the seed.sql file if needed.
  * Checks if categories and inventory data exist before reseeding.
  */
 const setupDatabase = async () => {
     // First check if the expected table exists to avoid relation-not-found errors.
     await ensureVehicleImagesTable();
+    await ensureServicesSchema();
     const tableCheck = await db.query(
         "SELECT to_regclass('public.categories') IS NOT NULL AS table_exists"
     );
@@ -221,6 +326,7 @@ const setupDatabase = async () => {
         await syncSampleInventory();
         await ensureVehicleImagesTable();
         await syncSampleVehicleImages();
+        await ensureServicesSchema();
         return true;
     }
     
@@ -243,6 +349,7 @@ const setupDatabase = async () => {
     await syncSampleInventory();
     await ensureVehicleImagesTable();
     await syncSampleVehicleImages();
+    await ensureServicesSchema();
     
     return true;
 };

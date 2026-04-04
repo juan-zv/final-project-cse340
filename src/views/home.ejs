@@ -27,10 +27,21 @@
     <section class="categories">
         <h2>Browse by Category</h2>
         <div class="category-grid">
-            <a href="/catalog?category=Cars" class="category-card"><h3>Cars</h3></a>
-            <a href="/catalog?category=Trucks" class="category-card"><h3>Trucks</h3></a>
-            <a href="/catalog?category=SUVs" class="category-card"><h3>SUVs</h3></a>
-            <a href="/catalog?category=Vans" class="category-card"><h3>Vans</h3></a>
+            <% if (typeof browseCategories !== 'undefined' && browseCategories.length > 0) { %>
+                <% browseCategories.forEach((category) => { %>
+                    <a href="<%= category.href %>" class="category-card <%= category.image ? 'has-image' : 'no-image' %>">
+                        <% if (category.image) { %>
+                            <img
+                                src="<%= category.image %>"
+                                alt="<%= `${category.name} category` %>"
+                                class="category-card-image"
+                                loading="lazy"
+                            >
+                        <% } %>
+                        <h3><%= category.name %></h3>
+                    </a>
+                <% }) %>
+            <% } %>
         </div>
     </section>
 

@@ -1,11 +1,14 @@
 import {
 	createCategory,
+	createService,
 	createVehicle,
 	deleteCategory,
+	deleteService,
 	deleteContactMessage,
 	deleteVehicle,
 	getAllAccounts,
 	getAllCategories,
+	getAllServices,
 	getAllVehiclesForAdmin,
 	getSystemActivity,
 	updateCategory,
@@ -36,6 +39,14 @@ export const buildAdminDashboard = async (req, res, next) => {
 					primaryLabel: 'Manage Categories',
 					secondaryLink: '/admin/dashboard',
 					secondaryLabel: 'Back to Shared Dashboard'
+				},
+				{
+					title: 'Service Catalog',
+					description: 'Add and delete dealership service offerings.',
+					primaryLink: '/admin/services',
+					primaryLabel: 'Manage Services',
+					secondaryLink: '/services',
+					secondaryLabel: 'View Requests'
 				},
 				{
 					title: 'Employee Accounts',
@@ -135,6 +146,54 @@ export const deleteCategoryAction = async (req, res, next) => {
 		res.redirect('/admin/categories');
 	} catch (error) {
 		req.flash('error', 'Unable to delete category.');
+		next(error);
+	}
+};
+
+export const buildServicesManagement = async (req, res, next) => {
+	try {
+		const services = await getAllServices();
+		res.render('admin/services', {
+			title: 'Manage Services',
+			services
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const createServiceAction = async (req, res, next) => {
+	try {
+		const serviceName = String(req.body.service_name || '').trim();
+		const serviceDescription = String(req.body.service_description || '').trim();
+
+		if (!serviceName) {
+			req.flash('error', 'Service name is required.');
+			return res.redirect('/admin/services');
+		}
+
+		await createService(serviceName, serviceDescription);
+		req.flash('success', 'Service created successfully.');
+		res.redirect('/admin/services');
+	} catch (error) {
+		req.flash('error', 'Unable to create service. It may already exist.');
+		next(error);
+	}
+};
+
+export const deleteServiceAction = async (req, res, next) => {
+	try {
+		const serviceId = Number.parseInt(req.params.serviceId, 10);
+		if (!Number.isInteger(serviceId) || serviceId < 1) {
+			req.flash('error', 'Invalid service delete request.');
+			return res.redirect('/admin/services');
+		}
+
+		await deleteService(serviceId);
+		req.flash('success', 'Service deleted successfully.');
+		res.redirect('/admin/services');
+	} catch (error) {
+		req.flash('error', 'Unable to delete service. It may be in use by service requests.');
 		next(error);
 	}
 };
