@@ -5,41 +5,29 @@ import { contactValidation } from '../../middleware/validation/forms.js';
 
 const router = Router();
 
-/**
- * Display the contact form page.
- */
+/** Display the contact form page. */
 const showContactForm = (req, res) => {
     res.render('forms/contact/form', {
         title: 'Contact Us'
     });
 };
 
-/**
- * Handle contact form submission with validation.
- * If validation passes, save to database and redirect.
- * If validation fails, log errors and redirect back to form.
- */
+/** Handle contact form submission. */
 const handleContactSubmission = async (req, res) => {
-    // Check for validation errors
     const errors = validationResult(req);
 
-    // Inside your validation error check
     if (!errors.isEmpty()) {
-        // Store each validation error as a separate flash message
         errors.array().forEach(error => {
             req.flash('error', error.msg);
         });
         return res.redirect('/contact');
     }
 
-    // Extract validated data
     const { sender_name, sender_email, message } = req.body;
 
     try {
-        // Save to database
         await createContactForm(sender_name, sender_email, message);
         console.log('Contact form submitted successfully');
-        // After successfully saving to the database
         req.flash('success', 'Thank you for contacting us! We will respond soon.');
         res.redirect('/contact');
     } catch (error) {
@@ -49,9 +37,7 @@ const handleContactSubmission = async (req, res) => {
     }
 };
 
-/**
- * Display all contact form submissions.
- */
+/** Display all contact form submissions. */
 const showContactResponses = async (req, res) => {
     let contactForms = [];
 
@@ -69,19 +55,10 @@ const showContactResponses = async (req, res) => {
     });
 };
 
-/**
- * GET /contact - Display the contact form
- */
 router.get('/', showContactForm);
 
-/**
- * POST /contact - Handle contact form submission with validation
- */
 router.post('/', contactValidation, handleContactSubmission);
 
-/**
- * GET /contact/responses - Display all contact form submissions
- */
 router.get('/responses', showContactResponses);
 
 export default router;

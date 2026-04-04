@@ -15,18 +15,13 @@ import { registrationValidation, editValidation } from '../../middleware/validat
 
 const router = Router();
 
-/**
- * Display the registration form page.
- */
+/** Display the registration form page. */
 const showRegistrationForm = (req, res) => {
     res.render('forms/registration/form', { title: 'User Registration' });
 };
 
-/**
- * Handle user registration with validation and password hashing.
- */
+/** Handle user registration. */
 const processRegistration = async (req, res) => {
-    // Check for validation errors
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -35,13 +30,9 @@ const processRegistration = async (req, res) => {
         return res.redirect('/register');
     }
 
-    // Extract validated data from request body
-    // TODO: Destructure name, email, password from req.body
     const { name, email, password } = req.body;
 
     try {
-        // Check if email already exists in database
-        // TODO: Call emailExists(email) and store the result in a variable
         const emailAlreadyExists = await emailExists(email);
 
         if (emailAlreadyExists) {
@@ -50,19 +41,11 @@ const processRegistration = async (req, res) => {
             return res.redirect('/register');
         }
 
-        // Hash the password before saving to database
-        // TODO: Use bcrypt.hash(password, 10) to hash the password
-        // TODO: Store the result in a variable called hashedPassword
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Save user to database with hashed password
-        // TODO: Call saveUser(name, email, hashedPassword)
         const newUser = await saveUser(name, email, hashedPassword);
 
-        // TODO: Log success message to console
         console.log('User registered successfully:', newUser);
-        // TODO: Redirect to /register/list to show successful registration
-        // NOTE: Later when we add authentication, we'll change this to require login first
         req.flash('success', 'Registration successful! Please log in.');
         return res.redirect('/login');
     } catch (error) {
@@ -72,9 +55,7 @@ const processRegistration = async (req, res) => {
     }
 };
 
-/**
- * Display all registered users.
- */
+/** Display all registered users. */
 const showAllUsers = async (req, res) => {
     let users = [];
 
@@ -90,10 +71,7 @@ const showAllUsers = async (req, res) => {
         user: req.session && req.session.user ? req.session.user : null
     });
 };
-/**
- * Display the edit account form
- * Users can edit their own account, admins can edit any account
- */
+/** Display the edit account form. */
 const showEditAccountForm = async (req, res) => {
     const targetUserId = parseInt(req.params.id);
     const currentUser = req.session.user;
@@ -105,7 +83,6 @@ const showEditAccountForm = async (req, res) => {
         return res.redirect('/dashboard/users');
     }
 
-    // Check permissions: users can edit themselves, admins can edit anyone
     const currentRole = (currentUser.roleName || '').toLowerCase();
     const canEdit = currentUser.id === targetUserId || currentRole === 'admin';
 
@@ -121,9 +98,7 @@ const showEditAccountForm = async (req, res) => {
     });
 };
 
-/**
- * Process account edit form submission
- */
+/** Process account edit form submission. */
 const processEditAccount = async (req, res) => {
     const errors = validationResult(req);
 
@@ -146,7 +121,6 @@ const processEditAccount = async (req, res) => {
             return res.redirect('/dashboard/users');
         }
 
-        // Check permissions
         const currentRole = (currentUser.roleName || '').toLowerCase();
         const canEdit = currentUser.id === targetUserId || currentRole === 'admin';
 
@@ -155,7 +129,6 @@ const processEditAccount = async (req, res) => {
             return res.redirect('/dashboard/users');
         }
 
-        // Check if new email already exists (and belongs to different user)
         const emailTaken = await emailExists(email);
         if (emailTaken && targetUser.email !== email) {
             req.flash('error', 'An account with this email already exists.');
@@ -167,10 +140,8 @@ const processEditAccount = async (req, res) => {
             ? account_type
             : null;
 
-        // Update the user
         await updateUser(targetUserId, name, email, accountType);
 
-        // If user edited their own account, update session
         if (currentUser.id === targetUserId) {
             req.session.user.name = name;
             req.session.user.email = email;
@@ -189,21 +160,16 @@ const processEditAccount = async (req, res) => {
     }
 };
 
-/**
- * Process account deletion
- * Only admins can delete accounts, and they cannot delete themselves
- */
+/** Process account deletion. */
 const processDeleteAccount = async (req, res) => {
     const targetUserId = parseInt(req.params.id);
     const currentUser = req.session.user;
 
-    // Only admins can delete accounts
     if ((currentUser.roleName || '').toLowerCase() !== 'admin') {
         req.flash('error', 'You do not have permission to delete accounts.');
         return res.redirect('/dashboard/users');
     }
 
-    // Prevent admins from deleting their own account
     if (currentUser.id === targetUserId) {
         req.flash('error', 'You cannot delete your own account.');
         return res.redirect('/dashboard/users');
@@ -225,34 +191,16 @@ const processDeleteAccount = async (req, res) => {
     res.redirect('/dashboard/users');
 };
 
-/**
- * GET /register - Display the registration form
- */
 router.get('/', showRegistrationForm);
 
-/**
- * POST /register - Handle registration form submission with validation
- */
 router.post('/', registrationValidation, processRegistration);
 
-/**
- * GET /register/list - Legacy route that redirects to /dashboard/users
- */
 router.get('/list', requireAdmin, (req, res) => res.redirect('/dashboard/users'));
 
-/**
- * GET /register/:id/edit - Display edit account form
- */
 router.get('/:id/edit', requireLogin, showEditAccountForm);
 
-/**
- * POST /register/:id/edit - Process account edit
- */
 router.post('/:id/edit', requireLogin, editValidation, processEditAccount);
 
-/**
- * POST /register/:id/delete - Delete user account
- */
 router.post('/:id/delete', requireLogin, processDeleteAccount);
 
 export default router;
