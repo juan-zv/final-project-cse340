@@ -34,7 +34,7 @@ export const buildAdminDashboard = async (req, res, next) => {
 					description: 'Add, edit, and delete categories.',
 					primaryLink: '/admin/categories',
 					primaryLabel: 'Manage Categories',
-					secondaryLink: '/dashboard',
+					secondaryLink: '/admin/dashboard',
 					secondaryLabel: 'Back to Shared Dashboard'
 				},
 				{

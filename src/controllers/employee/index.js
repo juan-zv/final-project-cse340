@@ -14,7 +14,7 @@ export const buildEmployeeDashboard = async (req, res, next) => {
 					description: 'Update pricing, descriptions, and availability for listed vehicles.',
 					primaryLink: '/employee/vehicles',
 					primaryLabel: 'Open Vehicle Inventory',
-					secondaryLink: '/dashboard',
+					secondaryLink: '/employee/dashboard',
 					secondaryLabel: 'Back to Shared Dashboard'
 				},
 				{

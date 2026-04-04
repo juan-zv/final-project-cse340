@@ -6,11 +6,11 @@
 	<section class="card" style="margin-bottom: 1rem;">
 		<p>Welcome back<%= user && user.name ? `, ${user.name}` : '' %>. You are signed in.</p>
 		<% if (role === 'Admin') { %>
-			<a href="/dashboard" class="btn btn-primary">Manage Inventory</a>
+			<a href="/admin/dashboard" class="btn btn-primary">Manage Inventory</a>
 		<% } else if (role === 'Employee') { %>
-			<a href="/dashboard" class="btn btn-primary">Employee Inventory Tools</a>
+			<a href="/employee/dashboard" class="btn btn-primary">Employee Inventory Tools</a>
 		<% } else { %>
-			<a href="/dashboard" class="btn btn-primary">Go to My Dashboard</a>
+			<a href="/user/dashboard" class="btn btn-primary">Go to My Dashboard</a>
 		<% } %>
 	</section>
 <% } else { %>
