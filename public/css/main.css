@@ -89,6 +89,22 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 10px rgba(29, 180, 137, 0.2);
 }
 
+select option {
+    background-color: #172235;
+    color: var(--text-light);
+}
+
+select option:checked {
+    background-color: rgba(29, 180, 137, 0.35);
+    color: #ffffff;
+}
+
+select optgroup {
+    background-color: #172235;
+    color: rgba(243, 244, 246, 0.85);
+    font-weight: 600;
+}
+
 input::placeholder, textarea::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
