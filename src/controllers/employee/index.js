@@ -14,7 +14,7 @@ export const buildEmployeeDashboard = async (req, res, next) => {
 					description: 'Open the catalog and edit one vehicle at a time from its detail page.',
 					primaryLink: '/catalog',
 					primaryLabel: 'Open Catalog',
-					secondaryLink: '/employee/dashboard',
+					secondaryLink: '/dashboard',
 					secondaryLabel: 'Back to Shared Dashboard'
 				},
 				{
@@ -63,17 +63,17 @@ export const updateEmployeeVehicleDetailsAction = async (req, res, next) => {
 
 		if (!Number.isInteger(invId) || invId < 1) {
 			req.flash('error', 'Invalid vehicle update request.');
-			return res.redirect('/employee/vehicles');
+			return res.redirect('/catalog');
 		}
 
 		if (!invDescription) {
 			req.flash('error', 'Vehicle description is required.');
-			return res.redirect('/employee/vehicles');
+			return res.redirect('/catalog');
 		}
 
 		if (!Number.isFinite(invPrice) || invPrice < 0) {
 			req.flash('error', 'Vehicle price must be a valid non-negative number.');
-			return res.redirect('/employee/vehicles');
+			return res.redirect('/catalog');
 		}
 
 		await updateVehicleEmployeeDetails(invId, {
@@ -83,7 +83,7 @@ export const updateEmployeeVehicleDetailsAction = async (req, res, next) => {
 		});
 
 		req.flash('success', 'Vehicle details updated successfully.');
-		res.redirect('/employee/vehicles');
+		res.redirect('/catalog');
 	} catch (error) {
 		req.flash('error', 'Unable to update vehicle details.');
 		next(error);

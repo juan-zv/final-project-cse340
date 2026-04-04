@@ -264,6 +264,18 @@ const deleteContactMessage = async (messageId) => {
     return result.rows[0] || null;
 };
 
+const markContactMessageRead = async (messageId) => {
+    const query = `
+        UPDATE contact_messages
+        SET is_read = true
+        WHERE message_id = $1
+        RETURNING message_id, is_read
+    `;
+
+    const result = await db.query(query, [messageId]);
+    return result.rows[0] || null;
+};
+
 const getSystemActivity = async () => {
     const countsQuery = `
         SELECT
@@ -401,6 +413,7 @@ export {
     updateVehicle,
     updateVehicleEmployeeDetails,
     deleteVehicle,
+    markContactMessageRead,
     deleteContactMessage,
     getSystemActivity
 };

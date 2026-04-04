@@ -28,9 +28,9 @@
                     <% if (role === 'Admin') { %>
                         <li><a href="/admin/dashboard" class="<%= isActive('/admin') ? 'is-active' : '' %>" <%= isActive('/admin') ? 'aria-current="page"' : '' %>>Admin Dashboard</a></li>
                     <% } else if (role === 'Employee') { %>
-                        <li><a href="/employee/dashboard" class="<%= isActive('/employee') ? 'is-active' : '' %>" <%= isActive('/employee') ? 'aria-current="page"' : '' %>>Employee Dashboard</a></li>
+                        <li><a href="/dashboard" class="<%= isActive('/dashboard') ? 'is-active' : '' %>" <%= isActive('/dashboard') ? 'aria-current="page"' : '' %>>Employee Dashboard</a></li>
                     <% } else { %>
-                        <li><a href="/user/dashboard" class="<%= isActive('/user') ? 'is-active' : '' %>" <%= isActive('/user') ? 'aria-current="page"' : '' %>>My Dashboard</a></li>
+                        <li><a href="/dashboard" class="<%= isActive('/dashboard') ? 'is-active' : '' %>" <%= isActive('/dashboard') ? 'aria-current="page"' : '' %>>My Dashboard</a></li>
                     <% } %>
                     <li><a href="/logout">Log Out</a></li>
                 <% } else { %>

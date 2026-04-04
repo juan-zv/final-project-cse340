@@ -266,6 +266,16 @@ const ensureServicesSchema = async () => {
                 WHERE LOWER(s.service_name) = LOWER(COALESCE(NULLIF(TRIM(sr.service_type), ''), 'General Maintenance'))
                   AND sr.service_id IS NULL
             `);
+
+                        await db.query(`
+                                UPDATE service_requests sr
+                                SET service_type = s.service_name
+                                FROM services s
+                                WHERE sr.service_id = s.service_id
+                                    AND (sr.service_type IS NULL OR TRIM(sr.service_type) = '')
+                        `);
+
+                        await db.query('ALTER TABLE service_requests ALTER COLUMN service_type DROP NOT NULL');
         }
 
         await db.query(`
@@ -281,6 +291,27 @@ const ensureServicesSchema = async () => {
     }
 
     await db.query('ALTER TABLE service_requests ALTER COLUMN service_id SET NOT NULL');
+
+    const serviceTypeColumnCheck = await db.query(`
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'service_requests'
+              AND column_name = 'service_type'
+        ) AS column_exists
+    `);
+
+    if (serviceTypeColumnCheck.rows[0]?.column_exists) {
+        await db.query(`
+            UPDATE service_requests sr
+            SET service_type = s.service_name
+            FROM services s
+            WHERE sr.service_id = s.service_id
+              AND (sr.service_type IS NULL OR TRIM(sr.service_type) = '')
+        `);
+        await db.query('ALTER TABLE service_requests ALTER COLUMN service_type DROP NOT NULL');
+    }
 
     await db.query(`
         DO $$

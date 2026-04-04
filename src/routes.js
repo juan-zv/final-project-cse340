@@ -36,13 +36,12 @@ import {
     updateVehicleAction,
     deleteVehicleAction,
     buildSystemActivity,
-    deleteContactMessageAction
+    deleteContactMessageAction,
+    markContactMessageReadAction
 } from './controllers/admin/index.js';
 import {
-    buildEmployeeDashboard,
     buildContactSubmissions
 } from './controllers/employee/index.js';
-import { buildUserDashboard } from './controllers/user/index.js';
 import {
     reviewValidation,
     serviceRequestUpdateValidation,
@@ -126,11 +125,13 @@ router.get('/admin/system', requireAdmin, buildSystemActivity);
 router.get('/admin/contact-form-submissions', requireAdmin, buildContactSubmissions);
 router.post('/admin/system/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
 router.post('/admin/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
+router.post('/admin/contact-messages/:messageId/read', requireAdmin, markContactMessageReadAction);
 router.post('/employee/contact-messages/:messageId/delete', requireEmployee, deleteContactMessageAction);
+router.post('/employee/contact-messages/:messageId/read', requireEmployee, markContactMessageReadAction);
 router.get('/dashboard/users', requireAdmin, showAllUsers);
-router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
+router.get('/employee/dashboard', requireEmployee, (req, res) => res.redirect('/dashboard'));
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
-router.get('/user/dashboard', requireLogin, buildUserDashboard);
+router.get('/user/dashboard', requireLogin, (req, res) => res.redirect('/dashboard'));
 
 // Reviews
 router.get('/reviews', requireLogin, buildReviewsList);

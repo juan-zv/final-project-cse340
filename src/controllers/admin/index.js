@@ -5,6 +5,7 @@ import {
 	deleteCategory,
 	deleteService,
 	deleteContactMessage,
+	markContactMessageRead,
 	deleteVehicle,
 	getAllAccounts,
 	getAllCategories,
@@ -53,8 +54,8 @@ export const buildAdminDashboard = async (req, res, next) => {
 					description: 'Review and manage staff accounts.',
 					primaryLink: '/admin/employees',
 					primaryLabel: 'Manage Staff Accounts',
-					secondaryLink: '/employee/dashboard',
-					secondaryLabel: 'Access Employee View'
+					secondaryLink: '/dashboard',
+					secondaryLabel: 'Open Shared Dashboard'
 				},
 				{
 					title: 'System Activity',
@@ -364,6 +365,27 @@ export const deleteContactMessageAction = async (req, res, next) => {
 		res.redirect(returnTo);
 	} catch (error) {
 		req.flash('error', 'Unable to delete contact message.');
+		next(error);
+	}
+};
+
+export const markContactMessageReadAction = async (req, res, next) => {
+	try {
+		const messageId = Number.parseInt(req.params.messageId, 10);
+		const returnTo = typeof req.body?.returnTo === 'string' && req.body.returnTo.startsWith('/')
+			? req.body.returnTo
+			: '/employee/contact-form-submissions';
+
+		if (!Number.isInteger(messageId) || messageId < 1) {
+			req.flash('error', 'Invalid contact message request.');
+			return res.redirect(returnTo);
+		}
+
+		await markContactMessageRead(messageId);
+		req.flash('success', 'Contact message marked as read.');
+		return res.redirect(returnTo);
+	} catch (error) {
+		req.flash('error', 'Unable to update contact message status.');
 		next(error);
 	}
 };

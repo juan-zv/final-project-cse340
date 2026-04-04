@@ -7,7 +7,9 @@
 
 <section class="card glass-panel">
 	<% const filterValues = (typeof filters !== 'undefined' && filters) ? filters : {}; %>
-	<form method="GET" action="/employee/contact-form-submissions" style="display:flex; flex-wrap:wrap; gap:0.75rem 1rem; align-items:flex-end;">
+	<% const currentRoleForFilters = user && (user.roleName || user.account_type || user.role); %>
+	<% const submissionsPath = currentRoleForFilters === 'Admin' ? '/admin/contact-form-submissions' : '/employee/contact-form-submissions'; %>
+	<form method="GET" action="<%= submissionsPath %>" style="display:flex; flex-wrap:wrap; gap:0.75rem 1rem; align-items:flex-end;">
 		<div style="display:grid; gap:0.35rem; min-width:170px; flex:0 1 210px;">
 			<label for="sortBy">Sort By</label>
 			<select id="sortBy" name="sortBy">
@@ -33,7 +35,7 @@
 
 		<div style="display:flex; gap:0.5rem; align-items:center;">
 			<button type="submit" class="btn btn-primary">Apply</button>
-			<a href="/employee/contact-form-submissions" class="btn">Reset</a>
+			<a href="<%= submissionsPath %>" class="btn">Reset</a>
 		</div>
 	</form>
 </section>
@@ -43,6 +45,7 @@
 	<% const currentRole = user && (user.roleName || user.account_type || user.role); %>
 	<% const isStaffUser = currentRole === 'Admin' || currentRole === 'Employee'; %>
 	<% const deleteBasePath = currentRole === 'Admin' ? '/admin/contact-messages' : '/employee/contact-messages'; %>
+	<% const readBasePath = currentRole === 'Admin' ? '/admin/contact-messages' : '/employee/contact-messages'; %>
 	<% const returnToPath = currentRole === 'Admin' ? '/admin/contact-form-submissions' : '/employee/contact-form-submissions'; %>
 	<% if (messages.length > 0) { %>
 		<table style="width:100%; border-collapse: collapse;">
@@ -68,6 +71,12 @@
 						<td style="padding: 0.5rem;"><%= item.submitted ? new Date(item.submitted).toLocaleString() : 'N/A' %></td>
 						<% if (isStaffUser) { %>
 							<td style="padding: 0.5rem;">
+								<% if (!item.isRead) { %>
+									<form action="<%= readBasePath %>/<%= item.id %>/read" method="POST" style="display:inline-block; margin-right: 0.35rem;">
+										<input type="hidden" name="returnTo" value="<%= returnToPath %>">
+										<button type="submit" class="btn btn-primary">Mark as Read</button>
+									</form>
+								<% } %>
 								<form action="<%= deleteBasePath %>/<%= item.id %>/delete" method="POST" style="display:inline-block;">
 									<input type="hidden" name="returnTo" value="<%= returnToPath %>">
 									<button type="submit" class="btn">Delete</button>

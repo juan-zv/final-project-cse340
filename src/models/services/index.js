@@ -1,5 +1,27 @@
 import db from '../db.js';
 
+let hasLegacyServiceTypeColumnCache = null;
+
+const hasLegacyServiceTypeColumn = async () => {
+    if (typeof hasLegacyServiceTypeColumnCache === 'boolean') {
+        return hasLegacyServiceTypeColumnCache;
+    }
+
+    const query = `
+        SELECT EXISTS (
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'service_requests'
+              AND column_name = 'service_type'
+        ) AS has_service_type
+    `;
+
+    const result = await db.query(query);
+    hasLegacyServiceTypeColumnCache = result.rows[0]?.has_service_type === true;
+    return hasLegacyServiceTypeColumnCache;
+};
+
 const mapServiceRequest = (row) => ({
     requestId: row.request_id,
     serviceId: row.service_id,
@@ -70,11 +92,25 @@ const getServiceRequestById = async (requestId) => {
 };
 
 const createServiceRequest = async (serviceId, requestNotes, accountId, invId = null) => {
-    const query = `
-        INSERT INTO service_requests (service_id, request_notes, account_id, inv_id)
-        VALUES ($1, $2, $3, $4)
-        RETURNING request_id
-    `;
+    const hasLegacyServiceType = await hasLegacyServiceTypeColumn();
+
+    const query = hasLegacyServiceType
+        ? `
+            INSERT INTO service_requests (service_id, service_type, request_notes, account_id, inv_id)
+            VALUES (
+                $1,
+                COALESCE((SELECT service_name FROM services WHERE service_id = $1), 'General Maintenance'),
+                $2,
+                $3,
+                $4
+            )
+            RETURNING request_id
+        `
+        : `
+            INSERT INTO service_requests (service_id, request_notes, account_id, inv_id)
+            VALUES ($1, $2, $3, $4)
+            RETURNING request_id
+        `;
 
     const result = await db.query(query, [serviceId, requestNotes, accountId, invId]);
     return result.rows[0] ? getServiceRequestById(result.rows[0].request_id) : {};

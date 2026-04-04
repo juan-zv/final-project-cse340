@@ -136,8 +136,8 @@ const showDashboard = (req, res) => {
                 {
                     title: 'Vehicle Updates',
                     description: 'Update vehicle descriptions, price, and availability.',
-                    primaryLink: '/employee/vehicles',
-                    primaryLabel: 'Edit Vehicles'
+                    primaryLink: '/catalog',
+                    primaryLabel: 'Open Inventory'
                 },
                 {
                     title: 'Review Moderation',
