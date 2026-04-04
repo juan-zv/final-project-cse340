@@ -17,6 +17,9 @@
 
 This project is a server-rendered car dealership website for customers, employees, and admins. Visitors can browse inventory, view vehicle details, and contact the dealership. Registered users can submit and manage reviews, create service requests, and track request history. Employees can manage inventory details, moderate reviews, and review incoming service and contact activity. Admins can manage categories, inventory, employee accounts, and system-wide data.
 
+[YouTube Link](https://youtu.be/DwAec4h4j34)
+[Render Link](https://final-project-cse340-1.onrender.com/)
+
 ## Database Schema
 
 The database schema and relationships are documented in the ERD exported from pgAdmin.
