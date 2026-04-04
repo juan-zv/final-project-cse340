@@ -22,14 +22,13 @@ if (!connectionString) {
     throw new Error('Missing database connection string. Set DB_URL or DATABASE_URL.');
 }
 
-const isRender = process.env.RENDER === 'true';
 const isProduction = process.env.NODE_ENV?.toLowerCase() === 'production';
 
 let ssl = false;
 if (process.env.DB_SSL === 'false') {
     ssl = false;
-} else if ((isRender || isProduction) && !caCert) {
-    // Render Postgres commonly uses managed certificates; this avoids CA-file coupling.
+} else if (isProduction && !caCert) {
+    // Managed Postgres providers commonly use platform certificates.
     ssl = { rejectUnauthorized: false };
 } else if (caCert) {
     ssl = {

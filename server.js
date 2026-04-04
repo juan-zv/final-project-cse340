@@ -29,7 +29,7 @@ if (NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
     console.warn('SESSION_SECRET is not set in production. Using fallback secret is not recommended.');
 }
 
-if (process.env.RENDER === 'true') {
+if (NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
