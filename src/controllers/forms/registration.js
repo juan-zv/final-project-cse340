@@ -10,7 +10,7 @@ import {
     deleteUser
 } from '../../models/forms/registration.js';
 import { requireLogin } from '../../middleware/auth.js';
-import { requireEmployee } from '../../middleware/auth.js';
+import { requireAdmin } from '../../middleware/auth.js';
 import { registrationValidation, editValidation } from '../../middleware/validation/forms.js';
 
 const router = Router();
@@ -102,7 +102,7 @@ const showEditAccountForm = async (req, res) => {
 
     if (!targetUser) {
         req.flash('error', 'User not found.');
-        return res.redirect('/register/list');
+        return res.redirect('/dashboard/users');
     }
 
     // Check permissions: users can edit themselves, admins can edit anyone
@@ -111,12 +111,13 @@ const showEditAccountForm = async (req, res) => {
 
     if (!canEdit) {
         req.flash('error', 'You do not have permission to edit this account.');
-        return res.redirect('/register/list');
+        return res.redirect('/dashboard/users');
     }
 
     res.render('forms/registration/edit', {
         title: 'Edit Account',
-        user: targetUser
+        user: targetUser,
+        isAdminEditing: currentRole === 'admin'
     });
 };
 
@@ -135,14 +136,14 @@ const processEditAccount = async (req, res) => {
 
     const targetUserId = parseInt(req.params.id);
     const currentUser = req.session.user;
-    const { name, email } = req.body;
+    const { name, email, account_type } = req.body;
 
     try {
         const targetUser = await getUserById(targetUserId);
 
         if (!targetUser) {
             req.flash('error', 'User not found.');
-            return res.redirect('/register/list');
+            return res.redirect('/dashboard/users');
         }
 
         // Check permissions
@@ -151,7 +152,7 @@ const processEditAccount = async (req, res) => {
 
         if (!canEdit) {
             req.flash('error', 'You do not have permission to edit this account.');
-            return res.redirect('/register/list');
+            return res.redirect('/dashboard/users');
         }
 
         // Check if new email already exists (and belongs to different user)
@@ -161,17 +162,26 @@ const processEditAccount = async (req, res) => {
             return res.redirect(`/register/${targetUserId}/edit`);
         }
 
+        const allowedRoles = ['User', 'Employee', 'Admin'];
+        const accountType = currentRole === 'admin' && allowedRoles.includes(account_type)
+            ? account_type
+            : null;
+
         // Update the user
-        await updateUser(targetUserId, name, email);
+        await updateUser(targetUserId, name, email, accountType);
 
         // If user edited their own account, update session
         if (currentUser.id === targetUserId) {
             req.session.user.name = name;
             req.session.user.email = email;
+            if (accountType) {
+                req.session.user.roleName = accountType;
+                req.session.user.account_type = accountType;
+            }
         }
 
         req.flash('success', 'Account updated successfully.');
-        res.redirect('/register/list');
+        res.redirect('/dashboard/users');
     } catch (error) {
         console.error('Error updating account:', error);
         req.flash('error', 'An error occurred while updating the account.');
@@ -190,13 +200,13 @@ const processDeleteAccount = async (req, res) => {
     // Only admins can delete accounts
     if ((currentUser.roleName || '').toLowerCase() !== 'admin') {
         req.flash('error', 'You do not have permission to delete accounts.');
-        return res.redirect('/register/list');
+        return res.redirect('/dashboard/users');
     }
 
     // Prevent admins from deleting their own account
     if (currentUser.id === targetUserId) {
         req.flash('error', 'You cannot delete your own account.');
-        return res.redirect('/register/list');
+        return res.redirect('/dashboard/users');
     }
 
     try {
@@ -212,7 +222,7 @@ const processDeleteAccount = async (req, res) => {
         req.flash('error', 'An error occurred while deleting the account.');
     }
 
-    res.redirect('/register/list');
+    res.redirect('/dashboard/users');
 };
 
 /**
@@ -226,9 +236,9 @@ router.get('/', showRegistrationForm);
 router.post('/', registrationValidation, processRegistration);
 
 /**
- * GET /register/list - Display all registered users
+ * GET /register/list - Legacy route that redirects to /dashboard/users
  */
-router.get('/list', requireEmployee, showAllUsers);
+router.get('/list', requireAdmin, (req, res) => res.redirect('/dashboard/users'));
 
 /**
  * GET /register/:id/edit - Display edit account form
@@ -246,3 +256,4 @@ router.post('/:id/edit', requireLogin, editValidation, processEditAccount);
 router.post('/:id/delete', requireLogin, processDeleteAccount);
 
 export default router;
+export { showAllUsers };

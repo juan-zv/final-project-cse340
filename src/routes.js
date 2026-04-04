@@ -1,6 +1,7 @@
 import { buildCatalogList, buildCatalogDetail, buildAddVehicleImage, addVehicleImageAction } from './controllers/inventory/index.js';
 import { homePage } from './controllers/index.js';
 import registrationRoutes from './controllers/forms/registration.js';
+import { showAllUsers } from './controllers/forms/registration.js';
 import loginRoutes from './controllers/forms/login.js';
 import contactRoutes from './controllers/forms/contact.js';
 import { processLogout, showDashboard } from './controllers/forms/login.js';
@@ -117,6 +118,7 @@ router.post('/admin/inventory/:invId/delete', requireAdmin, deleteVehicleAction)
 router.get('/admin/system', requireAdmin, buildSystemActivity);
 router.post('/admin/system/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
 router.post('/admin/contact-messages/:messageId/delete', requireAdmin, deleteContactMessageAction);
+router.get('/dashboard/users', requireAdmin, showAllUsers);
 router.get('/employee/dashboard', requireEmployee, buildEmployeeDashboard);
 router.get('/employee/contact-form-submissions', requireEmployee, buildContactSubmissions);
 router.get('/employee/vehicles', requireEmployee, buildEmployeeVehicleEditing);

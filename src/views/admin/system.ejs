@@ -27,6 +27,7 @@
 				<li>
 					<%= account.account_firstname %> <%= account.account_lastname %>
 					(<%= account.account_email %>) - <%= account.account_type %>
+					<a href="/register/<%= account.account_id %>/edit" class="btn" style="margin-left: 0.5rem;">Edit Role</a>
 				</li>
 			<% }) %>
 		</ul>

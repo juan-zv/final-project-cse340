@@ -99,15 +99,16 @@ const getUserById = async (id) => {
 /**
  * Update a user's name and email
  */
-const updateUser = async (id, name, email) => {
+const updateUser = async (id, name, email, accountType = null) => {
     const { firstName, lastName } = splitName(name);
 
     const query = `
         UPDATE accounts
         SET account_firstname = $1,
             account_lastname = $2,
-            account_email = $3
-        WHERE account_id = $4
+            account_email = $3,
+            account_type = COALESCE($4, account_type)
+        WHERE account_id = $5
         RETURNING
             account_id AS id,
             account_firstname || ' ' || account_lastname AS name,
@@ -115,7 +116,7 @@ const updateUser = async (id, name, email) => {
             created_at,
             account_type::text AS "roleName"
     `;
-    const result = await db.query(query, [firstName, lastName, email, id]);
+    const result = await db.query(query, [firstName, lastName, email, accountType, id]);
     return result.rows[0] || null;
 };
 
