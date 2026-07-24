@@ -52,7 +52,7 @@ const saveUser = async (name, email, hashedPassword) => {
             account_firstname || ' ' || account_lastname AS name,
             account_email AS email,
             created_at,
-            account_type::text AS "roleName"
+            account_type AS "roleName"
     `;
     const result = await db.query(query, [firstName, lastName, email, hashedPassword]);
     return result.rows[0];
@@ -70,7 +70,7 @@ const getAllUsers = async () => {
             account_firstname || ' ' || account_lastname AS name,
             account_email AS email,
             created_at,
-            account_type::text AS "roleName"
+            account_type AS "roleName"
         FROM accounts
         ORDER BY created_at DESC
     `;
@@ -88,7 +88,7 @@ const getUserById = async (id) => {
             account_firstname || ' ' || account_lastname AS name,
             account_email AS email,
             created_at,
-            account_type::text AS "roleName"
+            account_type AS "roleName"
         FROM accounts
         WHERE account_id = $1
     `;
@@ -114,7 +114,7 @@ const updateUser = async (id, name, email, accountType = null) => {
             account_firstname || ' ' || account_lastname AS name,
             account_email AS email,
             created_at,
-            account_type::text AS "roleName"
+            account_type AS "roleName"
     `;
     const result = await db.query(query, [firstName, lastName, email, accountType, id]);
     return result.rows[0] || null;

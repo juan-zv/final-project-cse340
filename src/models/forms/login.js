@@ -11,7 +11,7 @@ const findUserByEmail = async (email) => {
             account_firstname || ' ' || account_lastname AS name,
             account_email AS email,
             account_password AS password,
-            account_type::text AS "roleName"
+            account_type AS "roleName"
         FROM accounts
         WHERE LOWER(account_email) = LOWER($1)
         LIMIT 1
