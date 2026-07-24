@@ -1,110 +1,89 @@
-.contact-container {
-    width: min(1120px, 92vw);
-    margin: 0 auto;
-    padding: 2rem 0 3rem;
-    display: grid;
-    gap: 1.25rem;
-}
+/* ==========================================
+   NEOBRUTALISM CONTACT PAGE STYLES
+   ========================================== */
 
-.contact-hero,
-.contact-panel,
-.flash {
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 16px;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+.contact-container {
+    width: 100%;
+    display: grid;
+    gap: 1.5rem;
 }
 
 .contact-hero {
-    padding: 1.5rem;
+    background-color: var(--pop-green);
+    border: 3px solid var(--border-black);
+    border-radius: var(--radius-main);
+    padding: 2rem;
+    box-shadow: var(--shadow-hard-lg);
+}
+
+.contact-hero h1 {
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
 }
 
 .contact-hero p {
-    max-width: 70ch;
-    color: rgba(243, 244, 246, 0.9);
+    font-weight: 700;
+    font-size: 1.05rem;
 }
 
 .contact-layout {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .contact-panel {
-    padding: 1.25rem;
+    background-color: #FFFFFF;
+    border: 3px solid var(--border-black);
+    border-radius: var(--radius-main);
+    padding: 2rem;
+    box-shadow: var(--shadow-hard);
+}
+
+.contact-panel.side-panel {
+    background-color: var(--pop-purple);
+}
+
+.contact-panel h2 {
+    text-transform: uppercase;
+    margin-bottom: 1rem;
 }
 
 .contact-form {
-    display: grid;
-    gap: 0.6rem;
-}
-
-.contact-form label {
-    font-weight: 600;
-    color: rgba(243, 244, 246, 0.95);
+    display: flex;
+    flex-direction: column;
 }
 
 .field-error {
-    margin-top: -0.65rem;
-    margin-bottom: 0.5rem;
-    min-height: 1.1rem;
-    color: #ffb3b3;
-    font-size: 0.88rem;
+    margin-top: -0.85rem;
+    margin-bottom: 0.75rem;
+    color: #CC0000;
+    font-weight: 800;
+    font-size: 0.85rem;
 }
 
 .contact-form .is-invalid {
-    border-color: rgba(255, 122, 122, 0.75);
-    box-shadow: 0 0 8px rgba(255, 122, 122, 0.25);
+    border-color: var(--pop-red);
+    background-color: #FFF0F0;
 }
 
 .contact-form .btn {
-    margin-top: 0.4rem;
-    width: fit-content;
-}
-
-.benefit-list {
-    padding-left: 1rem;
-    display: grid;
-    gap: 0.5rem;
+    align-self: flex-start;
+    margin-top: 0.5rem;
 }
 
 .note {
-    margin-top: 1rem;
-    padding: 0.75rem 0.9rem;
-    border-radius: 10px;
-    background: rgba(17, 25, 40, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(243, 244, 246, 0.92);
-}
-
-.flash-stack {
-    display: grid;
-    gap: 0.6rem;
-}
-
-.flash {
-    margin: 0;
-    padding: 0.75rem 0.95rem;
-}
-
-.flash-success {
-    border-color: rgba(59, 225, 166, 0.45);
-    color: #bff5df;
-}
-
-.flash-error {
-    border-color: rgba(255, 122, 122, 0.55);
-    color: #ffd0d0;
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border-radius: var(--radius-main);
+    background-color: #FFFFFF;
+    border: 3px solid var(--border-black);
+    box-shadow: var(--shadow-hard-sm);
+    font-weight: 700;
 }
 
 @media (max-width: 860px) {
     .contact-layout {
         grid-template-columns: 1fr;
-    }
-
-    .contact-container {
-        width: min(1120px, 92vw);
-        padding-top: 1rem;
-        padding-inline: 0.25rem;
     }
 }

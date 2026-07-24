@@ -1,95 +1,66 @@
+/* ==========================================
+   NEOBRUTALISM REGISTRATION STYLES
+   ========================================== */
+
 .register-container {
-    width: min(1120px, 92vw);
-    margin: 0 auto;
-    padding: 2rem 0 3rem;
+    width: 100%;
     display: grid;
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
-.register-hero,
-.register-panel,
-.flash {
-    background: linear-gradient(155deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 16px;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
+.register-hero {
+    background-color: var(--pop-cyan);
+    border: 3px solid var(--border-black);
+    border-radius: var(--radius-main);
+    padding: 2rem;
+    box-shadow: var(--shadow-hard-lg);
 }
 
-.register-hero,
-.register-panel {
-    padding: 1.25rem;
+.register-hero h1 {
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
 }
 
 .register-hero p {
-    max-width: 70ch;
-    color: rgba(243, 244, 246, 0.9);
+    font-weight: 700;
+    font-size: 1.05rem;
 }
 
 .register-layout {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
-    gap: 1rem;
+    gap: 1.5rem;
+}
+
+.register-panel {
+    background-color: #FFFFFF;
+    border: 3px solid var(--border-black);
+    border-radius: var(--radius-main);
+    padding: 2rem;
+    box-shadow: var(--shadow-hard);
+}
+
+.register-panel.side-panel {
+    background-color: var(--pop-yellow);
+}
+
+.register-panel h2 {
+    text-transform: uppercase;
+    margin-bottom: 1rem;
 }
 
 .register-form {
-    display: grid;
-    gap: 0.6rem;
-}
-
-.register-form label {
-    font-weight: 600;
-    color: rgba(243, 244, 246, 0.95);
+    display: flex;
+    flex-direction: column;
 }
 
 .register-form .btn {
+    align-self: flex-start;
     margin-top: 0.5rem;
-    width: fit-content;
-}
-
-.form-note {
-    margin-top: 0.9rem;
-    color: rgba(243, 244, 246, 0.92);
-}
-
-.benefit-list {
-    padding-left: 1rem;
-    display: grid;
-    gap: 0.5rem;
-}
-
-.flash-stack {
-    display: grid;
-    gap: 0.6rem;
-}
-
-.flash {
-    margin: 0;
-    padding: 0.75rem 0.95rem;
-}
-
-.flash-success {
-    border-color: rgba(59, 225, 166, 0.45);
-    color: #bff5df;
-}
-
-.flash-error {
-    border-color: rgba(255, 122, 122, 0.55);
-    color: #ffd0d0;
-}
-
-.flash-warning {
-    border-color: rgba(255, 209, 102, 0.55);
-    color: #ffecc0;
 }
 
 @media (max-width: 860px) {
     .register-layout {
         grid-template-columns: 1fr;
-    }
-
-    .register-container {
-        width: min(1120px, 92vw);
-        padding-top: 1rem;
-        padding-inline: 0.25rem;
     }
 }
