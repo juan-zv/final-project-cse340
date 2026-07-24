@@ -9,8 +9,7 @@ import { addLocalVariables } from './src/middleware/global.js';
 
 // Database
 import { setupDatabase, testConnection } from './src/models/setup.js';
-import connectPgSimple from 'connect-pg-simple';
-import { pgPool } from './src/models/db.js';
+import { LibsqlSessionStore } from './src/utils/session-store.js';
 
 // Utils / Middleware
 import { startSessionCleanup } from './src/utils/session-cleanup.js';
@@ -33,16 +32,9 @@ if (NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
-// Initialize PostgreSQL session store
-const pgSession = connectPgSimple(session);
-
-// Session Configuration using Database
+// Session Configuration using Database (LibSQL / SQLite compatible)
 app.use(session({
-    store: new pgSession({
-        pool: pgPool,
-        tableName: 'session',
-        createTableIfMissing: true
-    }),
+    store: new LibsqlSessionStore({ tableName: 'sessions' }),
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
@@ -137,8 +129,12 @@ if (NODE_ENV.includes('dev')) {
     }).catch(err => console.error('Failed to import ws:', err));
 }
 
-app.listen(PORT, async () => {
+async function start() {
     await setupDatabase();
     await testConnection();
-    console.log(`Server running at http://localhost:${PORT}`);
-});
+    app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+    });
+}
+
+start();

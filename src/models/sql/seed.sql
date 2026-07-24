@@ -1,44 +1,36 @@
--- Database seed file for Car Dealership
-BEGIN;
+-- Database seed file for Car Dealership (SQLite / libSQL compatible)
+BEGIN TRANSACTION;
 
 -- Drop existing tables
-DROP TABLE IF EXISTS service_requests CASCADE;
-DROP TABLE IF EXISTS services CASCADE;
-DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS contact_messages CASCADE;
-DROP TABLE IF EXISTS vehicle_images CASCADE;
-DROP TABLE IF EXISTS inventory CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
-DROP TABLE IF EXISTS accounts CASCADE;
-
--- Drop types if they exist
-DROP TYPE IF EXISTS account_type CASCADE;
-DROP TYPE IF EXISTS service_status CASCADE;
-
--- Create valid enum types
-CREATE TYPE account_type AS ENUM ('User', 'Employee', 'Admin');
-CREATE TYPE service_status AS ENUM ('Submitted', 'In Progress', 'Completed');
+DROP TABLE IF EXISTS service_requests;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS contact_messages;
+DROP TABLE IF EXISTS vehicle_images;
+DROP TABLE IF EXISTS inventory;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS accounts;
 
 -- Create accounts table
 CREATE TABLE accounts (
-    account_id SERIAL PRIMARY KEY,
+    account_id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_firstname VARCHAR(100) NOT NULL,
     account_lastname VARCHAR(100) NOT NULL,
     account_email VARCHAR(150) UNIQUE NOT NULL,
     account_password VARCHAR(255) NOT NULL,
-    account_type account_type DEFAULT 'User',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    account_type TEXT DEFAULT 'User' CHECK (account_type IN ('User', 'Employee', 'Admin')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create categories table
 CREATE TABLE categories (
-    category_id SERIAL PRIMARY KEY,
+    category_id INTEGER PRIMARY KEY AUTOINCREMENT,
     category_name VARCHAR(50) UNIQUE NOT NULL
 );
 
 -- Create inventory table (vehicles)
 CREATE TABLE inventory (
-    inv_id SERIAL PRIMARY KEY,
+    inv_id INTEGER PRIMARY KEY AUTOINCREMENT,
     inv_make VARCHAR(50) NOT NULL,
     inv_model VARCHAR(50) NOT NULL,
     inv_year VARCHAR(4) NOT NULL,
@@ -47,29 +39,29 @@ CREATE TABLE inventory (
     inv_thumbnail VARCHAR(100) NOT NULL,
     inv_price NUMERIC(10, 2) NOT NULL,
     inv_miles INTEGER NOT NULL,
-    is_available BOOLEAN DEFAULT true,
+    is_available INTEGER DEFAULT 1,
     category_id INTEGER NOT NULL,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
 );
 
 -- Create vehicle images table (one vehicle to many images)
 CREATE TABLE vehicle_images (
-    image_id SERIAL PRIMARY KEY,
+    image_id INTEGER PRIMARY KEY AUTOINCREMENT,
     inv_id INTEGER NOT NULL,
     image_path VARCHAR(255) NOT NULL,
     image_label VARCHAR(120),
     sort_order INTEGER DEFAULT 1,
-    is_primary BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_primary INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_vehicle_images_inventory
         FOREIGN KEY (inv_id) REFERENCES inventory(inv_id) ON DELETE CASCADE
 );
 
 -- Create reviews table
 CREATE TABLE reviews (
-    review_id SERIAL PRIMARY KEY,
+    review_id INTEGER PRIMARY KEY AUTOINCREMENT,
     review_text TEXT NOT NULL,
-    review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    review_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     inv_id INTEGER NOT NULL,
     account_id INTEGER NOT NULL,
     CONSTRAINT fk_review_inventory FOREIGN KEY (inv_id) REFERENCES inventory(inv_id) ON DELETE CASCADE,
@@ -78,33 +70,33 @@ CREATE TABLE reviews (
 
 -- Create services catalog table
 CREATE TABLE services (
-    service_id SERIAL PRIMARY KEY,
+    service_id INTEGER PRIMARY KEY AUTOINCREMENT,
     service_name VARCHAR(100) UNIQUE NOT NULL,
     service_description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create service requests table
 CREATE TABLE service_requests (
-    request_id SERIAL PRIMARY KEY,
+    request_id INTEGER PRIMARY KEY AUTOINCREMENT,
     service_id INTEGER NOT NULL,
-    service_status service_status DEFAULT 'Submitted',
+    service_status TEXT DEFAULT 'Submitted' CHECK (service_status IN ('Submitted', 'In Progress', 'Completed')),
     request_notes TEXT,
     account_id INTEGER NOT NULL,
     inv_id INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_service_account FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
     CONSTRAINT fk_service_catalog FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE RESTRICT
 );
 
 -- Create contact messages table
 CREATE TABLE contact_messages (
-    message_id SERIAL PRIMARY KEY,
+    message_id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_name VARCHAR(100) NOT NULL,
     sender_email VARCHAR(150) NOT NULL,
     message_body TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    is_read INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Insert initial categories
@@ -117,7 +109,7 @@ INSERT INTO categories (category_name) VALUES
 -- Seed default accounts (all use password: P@$$w0rd! via bcrypt hash)
 INSERT INTO accounts (account_firstname, account_lastname, account_email, account_password, account_type) VALUES
     ('Admin', 'Account', 'admin@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Admin'),
-    ('Employee', 'Account', 'employee@exampl.ecom', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Employee'),
+    ('Employee', 'Account', 'employee@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'Employee'),
     ('User', 'Account', 'user@example.com', '$2b$10$JbBLnRVfGvIcfC.Ovtiae.dDQnuN0pm8PGkber1dwBFEy4bKEM.Lm', 'User');
 
 -- Seed service offerings
@@ -161,30 +153,29 @@ INSERT INTO vehicle_images (
     sort_order,
     is_primary
 ) VALUES
-    (1, '/images/ford-f-150.jpg', 'Primary image', 1, true),
-    (1, '/images/ford-f-150.jpg', 'Secondary image', 2, false),
-    (2, '/images/chevrolet-silverado-1500.jpg', 'Primary image', 1, true),
-    (2, '/images/chevrolet-silverado-1500.jpg', 'Secondary image', 2, false),
-    (3, '/images/ram-1500.jpg', 'Primary image', 1, true),
-    (3, '/images/ram-1500.jpg', 'Secondary image', 2, false),
-    (4, '/images/honda-odyssey.jpg', 'Primary image', 1, true),
-    (4, '/images/honda-odyssey.jpg', 'Secondary image', 2, false),
-    (5, '/images/toyota-sienna.jpg', 'Primary image', 1, true),
-    (5, '/images/toyota-sienna.jpg', 'Secondary image', 2, false),
-    (6, '/images/dodge-grand-caravan.webp', 'Primary image', 1, true),
-    (6, '/images/dodge-grand-caravan.webp', 'Secondary image', 2, false),
-    (7, '/images/toyota-camry.jpg', 'Primary image', 1, true),
-    (7, '/images/toyota-camry.jpg', 'Secondary image', 2, false),
-    (8, '/images/honda-civic.webp', 'Primary image', 1, true),
-    (8, '/images/honda-civic.webp', 'Secondary image', 2, false),
-    (9, '/images/nissan-altima.webp', 'Primary image', 1, true),
-    (9, '/images/nissan-altima.webp', 'Secondary image', 2, false),
-    (10, '/images/toyota-rav4.jpg', 'Primary image', 1, true),
-    (10, '/images/toyota-rav4.jpg', 'Secondary image', 2, false),
-    (11, '/images/honda-cr-v.jpg', 'Primary image', 1, true),
-    (11, '/images/honda-cr-v.jpg', 'Secondary image', 2, false),
-    (12, '/images/ford-escape.jpg', 'Primary image', 1, true),
-    (12, '/images/ford-escape.jpg', 'Secondary image', 2, false);
+    (1, '/images/ford-f-150.jpg', 'Primary image', 1, 1),
+    (1, '/images/ford-f-150.jpg', 'Secondary image', 2, 0),
+    (2, '/images/chevrolet-silverado-1500.jpg', 'Primary image', 1, 1),
+    (2, '/images/chevrolet-silverado-1500.jpg', 'Secondary image', 2, 0),
+    (3, '/images/ram-1500.jpg', 'Primary image', 1, 1),
+    (3, '/images/ram-1500.jpg', 'Secondary image', 2, 0),
+    (4, '/images/honda-odyssey.jpg', 'Primary image', 1, 1),
+    (4, '/images/honda-odyssey.jpg', 'Secondary image', 2, 0),
+    (5, '/images/toyota-sienna.jpg', 'Primary image', 1, 1),
+    (5, '/images/toyota-sienna.jpg', 'Secondary image', 2, 0),
+    (6, '/images/dodge-grand-caravan.webp', 'Primary image', 1, 1),
+    (6, '/images/dodge-grand-caravan.webp', 'Secondary image', 2, 0),
+    (7, '/images/toyota-camry.jpg', 'Primary image', 1, 1),
+    (7, '/images/toyota-camry.jpg', 'Secondary image', 2, 0),
+    (8, '/images/honda-civic.webp', 'Primary image', 1, 1),
+    (8, '/images/honda-civic.webp', 'Secondary image', 2, 0),
+    (9, '/images/nissan-altima.webp', 'Primary image', 1, 1),
+    (9, '/images/nissan-altima.webp', 'Secondary image', 2, 0),
+    (10, '/images/toyota-rav4.jpg', 'Primary image', 1, 1),
+    (10, '/images/toyota-rav4.jpg', 'Secondary image', 2, 0),
+    (11, '/images/honda-cr-v.jpg', 'Primary image', 1, 1),
+    (11, '/images/honda-cr-v.jpg', 'Secondary image', 2, 0),
+    (12, '/images/ford-escape.jpg', 'Primary image', 1, 1),
+    (12, '/images/ford-escape.jpg', 'Secondary image', 2, 0);
 
 COMMIT;
-

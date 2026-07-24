@@ -1,6 +1,5 @@
-import fs from 'fs';
+import { createClient } from '@libsql/client';
 import path from 'path';
-import { Pool } from 'pg';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,94 +13,93 @@ if (!process.env.DB_URL && !process.env.DATABASE_URL && typeof process.loadEnvFi
     }
 }
 
-const certPath = path.join(__dirname, '../../bin', 'byuicse-psql-cert.pem');
-const caCert = fs.existsSync(certPath) ? fs.readFileSync(certPath) : null;
-const connectionString = process.env.DB_URL || process.env.DATABASE_URL;
+let dbUrl = process.env.DB_URL || process.env.DATABASE_URL || 'file:local.db';
 
-if (!connectionString) {
-    throw new Error('Missing database connection string. Set DB_URL or DATABASE_URL.');
+// Ensure local file paths are resolved relative to workspace root if needed
+if (dbUrl.startsWith('file:') && !path.isAbsolute(dbUrl.replace('file:', ''))) {
+    const relativePath = dbUrl.replace('file:', '');
+    const absolutePath = path.resolve(path.join(__dirname, '../../'), relativePath);
+    dbUrl = `file:${absolutePath}`;
 }
 
-const isProduction = process.env.NODE_ENV?.toLowerCase() === 'production';
+const authToken = process.env.DB_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN;
 
-let ssl = false;
-if (process.env.DB_SSL === 'false') {
-    ssl = false;
-} else if (isProduction && !caCert) {
-    // Managed Postgres providers commonly use platform certificates.
-    ssl = { rejectUnauthorized: false };
-} else if (caCert) {
-    ssl = {
-        ca: caCert,
-        rejectUnauthorized: true,
-        checkServerIdentity: () => { return undefined; }
-    };
-}
-
-/**
- * Connection pool for PostgreSQL database.
- *
- * A connection pool maintains a set of reusable database connections
- * to avoid the overhead of creating new connections for each request.
- * This improves performance and reduces load on the database server.
- *
- * Uses a connection string from environment variables for simplified setup.
- * The connection string format is:
- * postgresql://username:password@host:port/database
- */
-const pool = new Pool({
-    connectionString,
-    max: Number(process.env.DB_POOL_MAX || 1),
-    idleTimeoutMillis: Number(process.env.DB_POOL_IDLE_MS || 10000),
-    connectionTimeoutMillis: Number(process.env.DB_POOL_CONNECT_TIMEOUT_MS || 5000),
-    ssl
+const client = createClient({
+    url: dbUrl,
+    authToken
 });
 
 /**
- * Since we will modify the normal pool object in development mode, we need to create and
- * export a reference to the pool object. This allows us to use the same name for the
- * export regardless of whether we are in development or production mode.
+ * Normalizes PostgreSQL $1, $2 parameter placeholders and maps arguments array accordingly.
  */
-let db = null;
+function normalizeSqlAndParams(text, params = []) {
+    if (!params || params.length === 0) {
+        return { sql: text, args: [] };
+    }
 
-if (process.env.NODE_ENV?.includes('dev') && process.env.ENABLE_SQL_LOGGING === 'true') {
-    /**
-     * In development mode, we wrap the pool to provide query logging.
-     * This helps with debugging by showing all executed queries in the console.
-     *
-     * The wrapper also adds timing information to help identify slow queries
-     * and tracks the number of rows affected by each query.
-     */
-    db = {
-        async query(text, params) {
-            try {
-                const start = Date.now();
-                const res = await pool.query(text, params);
-                const duration = Date.now() - start;
+    const matches = Array.from(text.matchAll(/\$(\d+)/g));
+    if (matches.length === 0) {
+        return { sql: text, args: params };
+    }
+
+    const newArgs = [];
+    for (const match of matches) {
+        const paramIndex = parseInt(match[1], 10) - 1;
+        newArgs.push(params[paramIndex]);
+    }
+
+    const sql = text.replace(/\$(\d+)/g, '?');
+    return { sql, args: newArgs };
+}
+
+/**
+ * Database wrapper compatible with PostgreSQL `pg` response structure ({ rows, rowCount }).
+ * Automatically translates `$1, $2, ...` positional parameter markers to `?` for SQLite compatibility.
+ */
+const db = {
+    async query(text, params = []) {
+        try {
+            // Handle multi-statement scripts (e.g. seed scripts)
+            if (params.length === 0 && text.includes(';') && (text.includes('CREATE TABLE') || text.includes('DROP TABLE'))) {
+                await client.executeMultiple(text);
+                return { rows: [], rowCount: 0 };
+            }
+
+            const { sql, args } = normalizeSqlAndParams(text, params);
+
+            const start = Date.now();
+            const res = await client.execute({ sql, args });
+            const duration = Date.now() - start;
+
+            const rows = res.rows ? Array.from(res.rows).map(row => ({ ...row })) : [];
+            const rowCount = res.rowsAffected !== undefined ? res.rowsAffected : rows.length;
+
+            if (process.env.NODE_ENV?.includes('dev') && process.env.ENABLE_SQL_LOGGING === 'true') {
                 console.log('Executed query:', {
                     text: text.replace(/\s+/g, ' ').trim(),
                     duration: `${duration}ms`,
-                    rows: res.rowCount
+                    rows: rowCount
                 });
-                return res;
-            } catch (error) {
-                console.error('Error in query:', {
-                    text: text.replace(/\s+/g, ' ').trim(),
-                    error: error.message
-                });
-                throw error;
             }
-        },
 
-        async close() {
-            await pool.end();
+            return {
+                rows,
+                rowCount,
+                insertId: res.lastInsertRowid
+            };
+        } catch (error) {
+            console.error('Error in query:', {
+                text: text.replace(/\s+/g, ' ').trim(),
+                error: error.message
+            });
+            throw error;
         }
-    };
-} else {
-    // In production, export the pool directly without logging overhead
-    db = pool;
-}
+    },
+
+    async close() {
+        await client.close();
+    }
+};
 
 export default db;
-export { caCert };
-export { pool as pgPool };
+export { client as libsqlClient };

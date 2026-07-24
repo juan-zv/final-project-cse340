@@ -10,15 +10,13 @@ const hasLegacyServiceTypeColumn = async () => {
     const query = `
         SELECT EXISTS (
             SELECT 1
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = 'service_requests'
-              AND column_name = 'service_type'
+            FROM pragma_table_info('service_requests')
+            WHERE name = 'service_type'
         ) AS has_service_type
     `;
 
     const result = await db.query(query);
-    hasLegacyServiceTypeColumnCache = result.rows[0]?.has_service_type === true;
+    hasLegacyServiceTypeColumnCache = Boolean(result.rows[0]?.has_service_type);
     return hasLegacyServiceTypeColumnCache;
 };
 
