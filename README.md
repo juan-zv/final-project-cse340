@@ -5,19 +5,20 @@
 - Runtime: Node.js
 - Backend framework: Express.js
 - Templating engine: EJS
+- Styling: Neobrutalism Design System (Vanilla CSS + Plus Jakarta Sans)
 - Module system: ECMAScript Modules (ESM)
-- Database: PostgreSQL
-- Database client: pg
-- Session store: express-session + connect-pg-simple
+- Database: SQLite / Turso (libSQL)
+- Database client: @libsql/client
+- Session store: express-session + LibsqlSessionStore
 - Validation: express-validator
 - Password hashing: bcrypt
 - Development tooling: nodemon, pnpm
 
 ## Project Description
 
-This project is a server-rendered car dealership website for customers, employees, and admins. Visitors can browse inventory, view vehicle details, and contact the dealership. Registered users can submit and manage reviews, create service requests, and track request history. Employees can manage inventory details, moderate reviews, and review incoming service and contact activity. Admins can manage categories, inventory, employee accounts, and system-wide data.
+This project is a server-rendered car dealership website for customers, employees, and admins styled in a vibrant **Neobrutalism** aesthetic. Visitors can browse inventory, view vehicle details, and contact the dealership. Registered users can submit and manage reviews, create service requests, and track request history. Employees can manage inventory details, moderate reviews, and review incoming service and contact activity. Admins can manage categories, inventory, employee accounts, and system-wide data.
 
-[YouTube Link](https://youtu.be/DwAec4h4j34)
+[YouTube Link](https://youtu.be/DwAec4h4j34)  
 [Render Link](https://final-project-cse340-1.onrender.com/)
 
 ## Database Schema
@@ -34,7 +35,7 @@ The database schema and relationships are documented in the ERD exported from pg
 
 ## Test Account Credentials
 
-Use the seeded test accounts below. The same shared password is used for all seeded accounts.
+Use the seeded test accounts below. The same shared password (`P@$$w0rd!`) is used for all seeded accounts:
 
 - Admin: `admin@example.com`
 - Employee: `employee@example.com`
@@ -49,24 +50,26 @@ Use the seeded test accounts below. The same shared password is used for all see
 
 ## Local Development
 
-1. Create a .env file with:
-	- DB_URL (or DATABASE_URL)
-	- SESSION_SECRET
-	- NODE_ENV=development
+1. Create a `.env` file with:
+   - `DB_URL=file:local.db` (for local SQLite) or `libsql://...` (for remote Turso DB)
+   - `SESSION_SECRET=your_secret_key`
+   - `NODE_ENV=development`
+   - `PORT=3000`
 2. Install dependencies:
-	- pnpm install
+   - `pnpm install`
 3. Start app:
-	- pnpm dev
+   - `pnpm dev`
 
 ## What The App Uses
 
-- MVC-style structure in src/controllers, src/models, and src/views
+- MVC-style structure in `src/controllers`, `src/models`, and `src/views`
+- Vibrant Neobrutalism UI design system (bold typography, pop colors, hard 0-blur drop shadows, thick black borders)
 - Role-aware authentication and dashboards (User, Employee, Admin)
 - EJS-rendered pages for home, auth forms, inventory, reviews, service requests, and admin/employee views
-- PostgreSQL-backed persistence for accounts, inventory, reviews, service requests, contact messages, and sessions
+- SQLite / Turso (libSQL)-backed persistence for accounts, inventory, reviews, service requests, contact messages, and sessions
 - Server-side validation for form input and session-based flash messaging
 
 ## Notes
 
 - Source code uses ESM imports/exports only (no CommonJS in app code).
-- Database connection accepts either DB_URL or DATABASE_URL.
+- Database connection accepts either local SQLite files (`file:local.db`) or remote Turso libSQL URLs (`libsql://...` with `DB_AUTH_TOKEN`).
